@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Menu, X, Settings } from 'lucide-react';
+import { ShoppingBag, Menu, X } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,17 +39,6 @@ export const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
-            <Link
-              href="/admin"
-              className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors border ${
-                isActive('/admin')
-                  ? 'border-indigo-500 bg-indigo-900/30 text-indigo-300'
-                  : 'border-gray-600 text-gray-400 hover:border-indigo-500 hover:text-indigo-400'
-              }`}
-            >
-              <Settings size={16} />
-              <span>Panel</span>
-            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -82,13 +71,6 @@ export const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
-            <Link
-              href="/admin"
-              onClick={() => setIsOpen(false)}
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-indigo-400 hover:bg-gray-700"
-            >
-              Yönetim Paneli
-            </Link>
           </div>
         </div>
       )}

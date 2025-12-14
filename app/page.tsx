@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Zap } from 'lucide-react';
 import { ProfileHeader } from '@/components/ProfileHeader';
 
@@ -10,6 +11,7 @@ interface Category {
   name: string;
   description: string | null;
   color: string | null;
+  imageUrl: string | null;
 }
 
 export default function Home() {
@@ -59,12 +61,24 @@ export default function Home() {
                 className="flex items-center justify-between p-3 bg-gray-800 border border-gray-700 rounded-xl hover:shadow-md hover:border-indigo-500 transition-all group w-full text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors shadow-sm"
-                    style={{ backgroundColor: category.color || '#6366f1' }}
-                  >
-                    <Zap size={20} />
-                  </div>
+                  {category.imageUrl ? (
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700 border border-gray-600 flex items-center justify-center">
+                      <Image
+                        src={category.imageUrl}
+                        alt={category.name}
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div 
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors shadow-sm"
+                      style={{ backgroundColor: category.color || '#6366f1' }}
+                    >
+                      {category.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <span className="font-bold text-base text-gray-200 group-hover:text-indigo-400">{category.name}</span>
                 </div>
                 
