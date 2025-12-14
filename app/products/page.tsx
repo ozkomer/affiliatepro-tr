@@ -1,13 +1,13 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CuratedListCard } from '@/components/CuratedListCard';
 import { Filter, Zap } from 'lucide-react';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { useStore } from '@/services/storage';
 
-export default function ProductList() {
+function ProductListContent() {
   const { lists, categories, products } = useStore();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -94,6 +94,14 @@ export default function ProductList() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductList() {
+  return (
+    <Suspense fallback={<div className="text-center py-20 text-gray-400">Yükleniyor...</div>}>
+      <ProductListContent />
+    </Suspense>
   );
 }
 
