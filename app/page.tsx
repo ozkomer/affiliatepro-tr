@@ -39,8 +39,8 @@ export default function Home() {
     }
   };
 
-  const handleCategoryClick = (categoryName: string) => {
-    router.push(`/products?category=${encodeURIComponent(categoryName)}`);
+  const handleCategoryClick = (categoryId: string) => {
+    router.push(`/category/${categoryId}`);
   };
 
   return (
@@ -57,7 +57,7 @@ export default function Home() {
             {categories.map(category => (
               <button
                 key={category.id}
-                onClick={() => handleCategoryClick(category.name)}
+                onClick={() => handleCategoryClick(category.id)}
                 className="flex items-center justify-between p-3 bg-gray-800 border border-gray-700 rounded-xl hover:shadow-md hover:border-indigo-500 transition-all group w-full text-left"
               >
                 <div className="flex items-center gap-3">

@@ -14,7 +14,7 @@ interface CuratedListCardProps {
 export const CuratedListCard: React.FC<CuratedListCardProps> = ({ list, productCount, previewProducts = [] }) => {
   return (
     <Link 
-      href={`/list/${list.id}`}
+      href={`/list/${list.slug || list.id}`}
       className="group bg-gray-800 rounded-2xl shadow-sm border border-gray-700 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
     >
       {/* Üst Taraf: Kapak Resmi - Kartın yarısını kaplayacak şekilde büyütüldü */}
