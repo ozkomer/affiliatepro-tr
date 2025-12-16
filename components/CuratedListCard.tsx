@@ -23,11 +23,17 @@ export const CuratedListCard: React.FC<CuratedListCardProps> = ({ list, productC
             <Layers size={12} />
             {productCount} Ürün
         </div>
-        <img
-          src={list.coverImage || 'https://picsum.photos/600/400'}
-          alt={list.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-        />
+        {list.coverImage ? (
+          <img
+            src={list.coverImage}
+            alt={list.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-indigo-900 to-gray-900 flex items-center justify-center">
+            <Layers size={48} className="text-gray-600" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
         
         {/* Kategori Badge'i resmin üzerine alındı */}
@@ -55,7 +61,13 @@ export const CuratedListCard: React.FC<CuratedListCardProps> = ({ list, productC
             <div className="flex -space-x-2">
               {previewProducts.slice(0, 4).map((prod) => (
                 <div key={prod.id} className="w-8 h-8 rounded-full border-2 border-gray-800 overflow-hidden bg-gray-700 relative z-0 hover:z-10 transition-all" title={prod.title}>
-                  <img src={prod.imageUrl} alt={prod.title} className="w-full h-full object-cover" />
+                  {prod.imageUrl ? (
+                    <img src={prod.imageUrl} alt={prod.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gray-600 flex items-center justify-center text-gray-400 text-xs">
+                      ?
+                    </div>
+                  )}
                 </div>
               ))}
               {productCount > 4 && (

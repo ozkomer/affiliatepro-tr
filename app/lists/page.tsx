@@ -1,12 +1,57 @@
 'use client'
 
-import React from 'react';
-import { useStore } from '@/services/storage';
+import React, { useEffect, useState } from 'react';
 import { CuratedListCard } from '@/components/CuratedListCard';
 import { ProfileHeader } from '@/components/ProfileHeader';
 
+interface List {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  coverImage: string | null;
+  youtubeUrl: string | null;
+  isFeatured: boolean;
+  categoryId: string | null;
+  category: {
+    id: string;
+    name: string;
+  } | null;
+  links: Array<{
+    id: string;
+    link: {
+      id: string;
+      title: string;
+      imageUrl: string | null;
+    } | null;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function AllLists() {
-  const { lists, products } = useStore();
+  const [lists, setLists] = useState<List[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLists();
+  }, []);
+
+  const fetchLists = async () => {
+    try {
+      const response = await fetch('/api/lists');
+      if (response.ok) {
+        const data = await response.json();
+        setLists(data);
+      } else {
+        console.error('Failed to fetch lists:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching lists:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -18,27 +63,52 @@ export default function AllLists() {
           <p className="text-gray-400 mt-2 text-lg">Konuya göre derlediğimiz en iyi ürün koleksiyonları.</p>
         </div>
 
-        {/* Grid güncellendi: Mobilde 1, Tablette 2, Geniş ekranda 4 sütun */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {lists.map(list => {
-            // Bu listeye ait ürünleri bul
-            const listProducts = products.filter(p => list.productIds.includes(p.id));
-            
-            return (
-              <CuratedListCard 
-                key={list.id} 
-                list={list} 
-                productCount={list.productIds.length} 
-                previewProducts={listProducts} 
-              />
-            );
-          })}
-          {lists.length === 0 && (
-            <div className="col-span-full py-12 text-center text-gray-400 bg-gray-800 rounded-xl border border-dashed border-gray-700">
-              Henüz liste bulunmamaktadır.
-            </div>
-          )}
-        </div>
+        {loading ? (
+          <div className="text-center text-gray-400 py-12">Yükleniyor...</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {lists.map(list => {
+              const productCount = list.links.filter(l => l.link !== null).length;
+              const previewProducts = list.links
+                .filter(l => l.link !== null)
+                .slice(0, 4)
+                .map(l => ({
+                  id: l.link!.id,
+                  title: l.link!.title,
+                  description: '',
+                  affiliateLinks: [],
+                  category: list.category?.name || '',
+                  imageUrl: l.link!.imageUrl || '',
+                  createdAt: Date.now(),
+                }));
+
+              return (
+                <CuratedListCard 
+                  key={list.id} 
+                  list={{
+                    id: list.id,
+                    title: list.title,
+                    slug: list.slug,
+                    description: list.description || '',
+                    productIds: list.links.filter(l => l.link !== null).map(l => l.link!.id),
+                    category: list.category?.name,
+                    coverImage: list.coverImage || undefined,
+                    youtubeUrl: list.youtubeUrl || undefined,
+                    isFeatured: list.isFeatured,
+                    createdAt: new Date(list.createdAt).getTime(),
+                  }}
+                  productCount={productCount}
+                  previewProducts={previewProducts}
+                />
+              );
+            })}
+            {lists.length === 0 && (
+              <div className="col-span-full py-12 text-center text-gray-400 bg-gray-800 rounded-xl border border-dashed border-gray-700">
+                Henüz liste bulunmamaktadır.
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

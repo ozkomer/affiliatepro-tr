@@ -1,9 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
-import { Zap } from 'lucide-react';
 import { ProfileHeader } from '@/components/ProfileHeader';
 
 interface Category {
@@ -17,7 +16,6 @@ interface Category {
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     fetchCategories();
@@ -28,7 +26,11 @@ export default function Home() {
       const response = await fetch('/api/categories');
       if (response.ok) {
         const data = await response.json();
-        setCategories(data);
+        // "Özel Listeler" kategorisini filtrele
+        const filteredCategories = data.filter((category: Category) => 
+          category.name.toLowerCase() !== 'özel listeler'
+        );
+        setCategories(filteredCategories);
       } else {
         console.error('Failed to fetch categories:', response.statusText);
       }
@@ -37,10 +39,6 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCategoryClick = (categoryId: string) => {
-    router.push(`/category/${categoryId}`);
   };
 
   return (
@@ -55,9 +53,9 @@ export default function Home() {
         <section className="max-w-4xl mx-auto px-4 w-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {categories.map(category => (
-              <button
+              <Link
                 key={category.id}
-                onClick={() => handleCategoryClick(category.id)}
+                href={`/category/${category.id}`}
                 className="flex items-center justify-between p-3 bg-gray-800 border border-gray-700 rounded-xl hover:shadow-md hover:border-indigo-500 transition-all group w-full text-left"
               >
                 <div className="flex items-center gap-3">
@@ -88,7 +86,7 @@ export default function Home() {
                     <path d="m12 5 7 7-7 7" />
                   </svg>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
         </section>

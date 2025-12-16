@@ -152,24 +152,41 @@ export default function CategoryPage() {
         {/* Listeler Grid */}
         {lists.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {lists.map((list) => (
-              <CuratedListCard
-                key={list.id}
-                list={{
-                  id: list.id,
-                  slug: list.slug,
-                  title: list.title,
-                  description: list.description || '',
-                  productIds: list.links.filter(l => l.link !== null).map(l => l.link!.id),
-                  coverImage: list.coverImage || '',
-                  youtubeUrl: list.youtubeUrl || '',
+            {lists.map((list) => {
+              const productCount = list.links.filter(l => l.link !== null).length;
+              const previewProducts = list.links
+                .filter(l => l.link !== null)
+                .slice(0, 4)
+                .map(l => ({
+                  id: l.link!.id,
+                  title: l.link!.title,
+                  description: '',
+                  affiliateLinks: [],
                   category: list.category?.name || '',
-                  isFeatured: list.isFeatured,
+                  imageUrl: l.link!.imageUrl || '',
                   createdAt: Date.now(),
-                }}
-                productCount={list.links.filter(l => l.link !== null).length}
-              />
-            ))}
+                }));
+
+              return (
+                <CuratedListCard
+                  key={list.id}
+                  list={{
+                    id: list.id,
+                    slug: list.slug,
+                    title: list.title,
+                    description: list.description || '',
+                    productIds: list.links.filter(l => l.link !== null).map(l => l.link!.id),
+                    coverImage: list.coverImage || undefined,
+                    youtubeUrl: list.youtubeUrl || undefined,
+                    category: list.category?.name,
+                    isFeatured: list.isFeatured,
+                    createdAt: Date.now(),
+                  }}
+                  productCount={productCount}
+                  previewProducts={previewProducts}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-20 bg-gray-800 rounded-xl border border-dashed border-gray-700">
