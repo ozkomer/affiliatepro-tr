@@ -20,6 +20,7 @@ export interface Product {
   imageUrl: string;
   affiliateLinks: AffiliateLink[];
   category: string;
+  shortUrl?: string; // Kısa URL (eneso.cc/product/[shortUrl])
   youtubeUrl?: string; // Opsiyonel YouTube video linki
   createdAt: number;
 }

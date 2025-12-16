@@ -18,7 +18,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, compact = fal
     return (
       <div className="group bg-gray-800 rounded-xl shadow-sm border border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-row h-32 md:h-40">
         {/* Sol Resim */}
-        <Link href={`/product/${product.id}`} className="w-32 md:w-48 flex-shrink-0 relative overflow-hidden bg-gray-900 p-2">
+        <Link href={`/product/${product.shortUrl || product.id}`} className="w-32 md:w-48 flex-shrink-0 relative overflow-hidden bg-gray-900 p-2">
           <img
             src={product.imageUrl || 'https://picsum.photos/400/300'}
             alt={product.title}
@@ -30,7 +30,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, compact = fal
         {/* Orta İçerik */}
         <div className="flex-grow p-3 md:p-4 flex flex-col justify-between min-w-0">
           <div>
-            <Link href={`/product/${product.id}`}>
+            <Link href={`/product/${product.shortUrl || product.id}`}>
               <h3 className="font-semibold text-gray-100 text-sm md:text-lg line-clamp-2 group-hover:text-indigo-400 transition-colors">
                 {product.title}
               </h3>
@@ -77,7 +77,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, compact = fal
   // aspect-square ve object-contain ile kareye sığdırma yapıldı
   return (
     <div className={`group bg-gray-800 rounded-xl shadow-sm border border-gray-700 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full ${compact ? 'text-sm' : ''}`}>
-      <Link href={`/product/${product.id}`} className="block relative aspect-square overflow-hidden bg-gray-900 p-4 cursor-pointer border-b border-gray-700">
+      <Link href={`/product/${product.shortUrl || product.id}`} className="block relative aspect-square overflow-hidden bg-gray-900 p-4 cursor-pointer border-b border-gray-700">
         <img
           src={product.imageUrl || 'https://picsum.photos/400/300'}
           alt={product.title}
@@ -92,7 +92,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, compact = fal
       </Link>
       
       <div className={`flex flex-col flex-grow ${compact ? 'p-3' : 'p-5'}`}>
-        <Link href={`/product/${product.id}`}>
+        <Link href={`/product/${product.shortUrl || product.id}`}>
           <h3 className={`font-semibold text-gray-100 line-clamp-2 group-hover:text-indigo-400 transition-colors ${compact ? 'text-sm mb-2' : 'text-lg mb-2'}`}>
             {product.title}
           </h3>

@@ -168,8 +168,11 @@ export default function ListDetails() {
                 <div key={item.id} className="group flex flex-col h-full">
                   {/* Product Card - Geni.us Style */}
                   <div className="bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-700 hover:shadow-3xl hover:border-gray-600 transition-all duration-500 flex flex-col h-full">
-                    {/* Product Image - Large and Centered */}
-                    <div className="relative w-full h-48 md:h-64 bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8 flex items-center justify-center">
+                    {/* Product Image - Large and Centered - Clickable */}
+                    <Link 
+                      href={`/product/${link.shortUrl}`}
+                      className="relative w-full h-48 md:h-64 bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8 flex items-center justify-center cursor-pointer"
+                    >
                       {link.imageUrl ? (
                         <div className="relative w-full h-full max-w-md mx-auto">
                           <Image
@@ -185,13 +188,15 @@ export default function ListDetails() {
                           <ShoppingCart size={80} />
                         </div>
                       )}
-                    </div>
+                    </Link>
                     
                     {/* Product Content */}
                     <div className="p-4 md:p-6 bg-gray-800 flex flex-col flex-grow">
-                      <h2 className="text-lg md:text-xl font-bold text-white mb-2 leading-tight line-clamp-2">
-                        {link.title}
-                      </h2>
+                      <Link href={`/product/${link.shortUrl}`}>
+                        <h2 className="text-lg md:text-xl font-bold text-white mb-2 leading-tight line-clamp-2 hover:text-indigo-400 transition-colors cursor-pointer">
+                          {link.title}
+                        </h2>
+                      </Link>
                       
                       {link.description && (
                         <p className="text-gray-300 text-sm md:text-base mb-4 leading-relaxed line-clamp-3 flex-grow">

@@ -64,6 +64,7 @@ model AffiliateLink {
   shortUrl    String   @unique // Shortened URL slug
   customSlug  String?  @unique // Optional custom slug
   imageUrl    String?  // Product image URL
+  youtubeUrl  String?  // YouTube video URL
   
   // Relations
   userId      String
