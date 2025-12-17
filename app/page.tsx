@@ -13,6 +13,14 @@ interface Category {
   imageUrl: string | null;
 }
 
+const CACHE_KEY = 'categories_cache';
+const CACHE_DURATION = 5 * 60 * 1000; // 5 dakika
+
+interface CacheData {
+  data: Category[];
+  timestamp: number;
+}
+
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,16 +29,78 @@ export default function Home() {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
+  const getCachedData = (): Category[] | null => {
+    if (typeof window === 'undefined') return null;
+    
     try {
-      const response = await fetch('/api/categories');
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (!cached) return null;
+      
+      const cacheData: CacheData = JSON.parse(cached);
+      const now = Date.now();
+      
+      // Cache süresi dolmuş mu kontrol et
+      if (now - cacheData.timestamp > CACHE_DURATION) {
+        localStorage.removeItem(CACHE_KEY);
+        return null;
+      }
+      
+      return cacheData.data;
+    } catch (error) {
+      console.error('Error reading cache:', error);
+      return null;
+    }
+  };
+
+  const setCachedData = (data: Category[]) => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const cacheData: CacheData = {
+        data,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+    } catch (error) {
+      console.error('Error setting cache:', error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    // Önce cache'den kontrol et
+    const cachedData = getCachedData();
+    if (cachedData) {
+      const filteredCategories = cachedData.filter((category: Category) => 
+        category.name.toLowerCase() !== 'özel listeler'
+      );
+      setCategories(filteredCategories);
+      setLoading(false);
+      
+      // Arka planda fresh data çek (stale-while-revalidate pattern)
+      fetchCategoriesFromAPI();
+      return;
+    }
+    
+    // Cache yoksa direkt API'den çek
+    await fetchCategoriesFromAPI();
+  };
+
+  const fetchCategoriesFromAPI = async () => {
+    try {
+      const response = await fetch('/api/categories', {
+        // Cache-Control header'ı API route'unda ayarlandı
+        cache: 'default',
+      });
+      
       if (response.ok) {
         const data = await response.json();
         // "Özel Listeler" kategorisini filtrele
         const filteredCategories = data.filter((category: Category) => 
           category.name.toLowerCase() !== 'özel listeler'
         );
+        
         setCategories(filteredCategories);
+        setCachedData(data); // Cache'e kaydet
       } else {
         console.error('Failed to fetch categories:', response.statusText);
       }
@@ -42,57 +112,48 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-12">
+    <div className="flex flex-col gap-8 pb-12">
       <ProfileHeader />
 
       {loading ? (
-        <section className="max-w-4xl mx-auto px-4 w-full">
-          <div className="text-center text-gray-400 py-8">Yükleniyor...</div>
+        <section className="max-w-5xl mx-auto px-4 w-full">
+          <div className="text-center text-gray-400 py-12">Yükleniyor...</div>
         </section>
       ) : categories.length > 0 ? (
-        <section className="max-w-4xl mx-auto px-4 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <section className="max-w-5xl mx-auto px-4 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map(category => (
               <Link
                 key={category.id}
                 href={`/category/${category.id}`}
-                className="flex items-center justify-between p-3 bg-gray-800 border border-gray-700 rounded-xl hover:shadow-md hover:border-indigo-500 transition-all group w-full text-left"
+                className="flex items-center gap-3 p-4 bg-gray-800/50 border border-gray-700/50 rounded-lg hover:bg-gray-800 hover:border-gray-600 transition-colors w-full text-left"
               >
-                <div className="flex items-center gap-3">
-                  {category.imageUrl ? (
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700 border border-gray-600 flex items-center justify-center">
-                      <Image
-                        src={category.imageUrl}
-                        alt={category.name}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div 
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors shadow-sm"
-                      style={{ backgroundColor: category.color || '#6366f1' }}
-                    >
-                      {category.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <span className="font-bold text-base text-gray-200 group-hover:text-indigo-400">{category.name}</span>
-                </div>
-                
-                <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-gray-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                </div>
+                {category.imageUrl ? (
+                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-700/50 flex items-center justify-center flex-shrink-0">
+                    <Image
+                      src={category.imageUrl}
+                      alt={category.name}
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div 
+                    className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-lg font-semibold flex-shrink-0"
+                    style={{ backgroundColor: category.color || '#4b5563' }}
+                  >
+                    {category.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="font-medium text-sm text-gray-200">{category.name}</span>
               </Link>
             ))}
           </div>
         </section>
       ) : (
-        <section className="max-w-4xl mx-auto px-4 w-full">
-          <div className="text-center text-gray-400 py-8">Henüz kategori bulunmuyor.</div>
+        <section className="max-w-5xl mx-auto px-4 w-full">
+          <div className="text-center text-gray-400 py-12">Henüz kategori bulunmuyor.</div>
         </section>
       )}
     </div>
