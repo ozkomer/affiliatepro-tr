@@ -22,9 +22,11 @@ function createPrismaClient() {
   
   const pool = new Pool({
     connectionString: finalConnectionString,
-    max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 30000,
+    max: 3, // Further reduced pool size to avoid hitting Supabase limits
+    min: 0, // Allow pool to close all connections when idle
+    idleTimeoutMillis: 10000, // Close idle connections faster
+    connectionTimeoutMillis: 5000,
+    allowExitOnIdle: true, // Allow pool to close idle connections
   })
 
   const adapter = new PrismaPg(pool)
@@ -49,5 +51,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export const prisma = prismaInstance
+
 
 

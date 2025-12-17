@@ -5,10 +5,16 @@ import Link from 'next/link';
 import { ArrowRight, Layers } from 'lucide-react';
 import { CuratedList, Product } from '@/types';
 
+interface PreviewProduct {
+  id: string;
+  title: string;
+  imageUrl: string | null;
+}
+
 interface CuratedListCardProps {
   list: CuratedList;
   productCount: number;
-  previewProducts?: Product[]; // Yeni özellik: Önizleme ürünleri
+  previewProducts?: PreviewProduct[]; // Yeni özellik: Önizleme ürünleri
 }
 
 export const CuratedListCard: React.FC<CuratedListCardProps> = ({ list, productCount, previewProducts = [] }) => {

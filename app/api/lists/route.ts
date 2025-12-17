@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const categoryId = searchParams.get('categoryId');
+  const { searchParams } = new URL(request.url);
+  const categoryId = searchParams.get('categoryId');
 
+  try {
     console.log('Fetching lists for categoryId:', categoryId);
 
     const where: any = {};
@@ -73,6 +73,70 @@ export async function GET(request: NextRequest) {
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     console.error('Error name:', error.name);
+    
+    // Check if it's a connection pool error
+    const isPoolError = error.message?.includes('MaxClientsInSessionMode') || 
+                        error.message?.includes('max clients') ||
+                        error.message?.includes('pool');
+    
+    if (isPoolError) {
+      console.error('Connection pool error detected. Retrying after delay...');
+      // Wait a bit and retry once
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      try {
+        const retryLists = await prisma.curatedList.findMany({
+          where: categoryId ? { categoryId } : {},
+          include: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            links: {
+              include: {
+                link: {
+                  select: {
+                    id: true,
+                    title: true,
+                    imageUrl: true,
+                  },
+                },
+              },
+              orderBy: {
+                order: 'asc',
+              },
+              take: 100,
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+        
+        const formattedLists = retryLists.map((list: any) => ({
+          id: list.id,
+          title: list.title,
+          slug: list.slug,
+          description: list.description,
+          coverImage: list.coverImage,
+          youtubeUrl: list.youtubeUrl,
+          isFeatured: list.isFeatured,
+          categoryId: list.categoryId,
+          category: list.category,
+          links: list.links.map((linkItem: any) => ({
+            id: linkItem.id,
+            link: linkItem.link,
+          })),
+          createdAt: list.createdAt,
+          updatedAt: list.updatedAt,
+        }));
+        
+        return NextResponse.json(formattedLists);
+      } catch (retryError: any) {
+        console.error('Retry also failed:', retryError);
+      }
+    }
     
     // Check if it's a Prisma error
     if (error.code) {
