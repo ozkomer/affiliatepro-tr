@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Navbar } from "@/components/Navbar";
+import { NavbarWrapper } from "@/components/NavbarWrapper";
 
 export const metadata: Metadata = {
   title: "AffiliatePro - En İyi Ürün Tavsiyeleri",
@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="tr" className="dark">
       <body className="bg-gray-900 text-gray-100">
         <div className="min-h-screen bg-gray-900 flex flex-col">
-          <Navbar />
+          <NavbarWrapper />
           <main className="flex-grow">
             {children}
           </main>

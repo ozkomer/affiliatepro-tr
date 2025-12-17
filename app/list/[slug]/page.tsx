@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Share2, Youtube, ExternalLink, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Share2, ExternalLink, ShoppingCart } from 'lucide-react';
 import { ProfileHeader } from '@/components/ProfileHeader';
+import { Navbar } from '@/components/Navbar';
 
 interface ProductUrl {
   id: string;
@@ -154,11 +155,22 @@ export default function ListDetails() {
   return (
     <div className="min-h-screen bg-gray-950">
       {/* Hero Section - Geni.us Style */}
-      <div className="bg-gradient-to-b from-gray-900 to-gray-950 text-white py-8 md:py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div 
+        className="relative text-white py-8 md:py-12 overflow-hidden"
+        style={{
+          backgroundImage: list.coverImage ? `url(${list.coverImage})` : 'linear-gradient(to bottom, rgb(17 24 39), rgb(3 7 18))',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
+        
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">{list.title}</h1>
           {list.description && (
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6">
+            <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed mb-6">
               {list.description}
             </p>
           )}
@@ -173,7 +185,7 @@ export default function ListDetails() {
       {/* Products Section - Geni.us Style */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {sortedLinks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {sortedLinks.map((item, index) => {
               const link = item.link;
               if (!link) return null;
@@ -185,18 +197,16 @@ export default function ListDetails() {
                     {/* Product Image - Large and Centered - Clickable */}
                     <Link 
                       href={`/product/${link.shortUrl}`}
-                      className="relative w-full h-48 md:h-64 bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8 flex items-center justify-center cursor-pointer"
+                      className="relative w-full h-40 md:h-48 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden cursor-pointer"
                     >
                       {link.imageUrl ? (
-                        <div className="relative w-full h-full max-w-md mx-auto">
-                          <Image
-                            src={link.imageUrl}
-                            alt={link.title}
-                            fill
-                            className="object-contain group-hover:scale-105 transition-transform duration-700"
-                            unoptimized
-                          />
-                        </div>
+                        <Image
+                          src={link.imageUrl}
+                          alt={link.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-700"
+                          unoptimized
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-500">
                           <ShoppingCart size={80} />
@@ -205,15 +215,15 @@ export default function ListDetails() {
                     </Link>
                     
                     {/* Product Content */}
-                    <div className="p-4 md:p-6 bg-gray-800 flex flex-col flex-grow">
+                    <div className="p-3 md:p-4 bg-gray-800 flex flex-col flex-grow">
                       <Link href={`/product/${link.shortUrl}`}>
-                        <h2 className="text-lg md:text-xl font-bold text-white mb-2 leading-tight line-clamp-2 hover:text-indigo-400 transition-colors cursor-pointer">
+                        <h2 className="text-base md:text-lg font-bold text-white mb-2 leading-tight line-clamp-2 hover:text-indigo-400 transition-colors cursor-pointer">
                           {link.title}
                         </h2>
                       </Link>
                       
                       {link.description && (
-                        <p className="text-gray-300 text-sm md:text-base mb-4 leading-relaxed line-clamp-3 flex-grow">
+                        <p className="text-gray-300 text-xs md:text-sm mb-3 leading-relaxed line-clamp-2 flex-grow">
                           {link.description}
                         </p>
                       )}
@@ -227,7 +237,11 @@ export default function ListDetails() {
                               href={productUrl.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="group/btn w-full text-white font-bold text-sm md:text-base py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+                              className={`group/btn w-full text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-[1.02] ${
+                                productUrl.ecommerceBrand.logo 
+                                  ? 'p-0 overflow-hidden' 
+                                  : 'text-xs md:text-sm py-2 md:py-3 px-3 md:px-4 gap-2'
+                              }`}
                               style={{
                                 backgroundColor: productUrl.ecommerceBrand.color || '#6366f1',
                                 ...(productUrl.ecommerceBrand.color ? {
@@ -247,14 +261,15 @@ export default function ListDetails() {
                                 }
                               }}
                             >
-                              {productUrl.ecommerceBrand.logo && (
+                              {productUrl.ecommerceBrand.logo ? (
                                 <img 
                                   src={productUrl.ecommerceBrand.logo} 
                                   alt={productUrl.ecommerceBrand.name}
-                                  className="w-5 h-5 object-contain"
+                                  className="w-full h-full object-cover"
                                 />
+                              ) : (
+                                <span>{productUrl.ecommerceBrand.name}'da Al</span>
                               )}
-                              <span>{productUrl.ecommerceBrand.name}'da Al</span>
                             </a>
                           ))
                         ) : link.ecommerceBrand ? (
@@ -262,7 +277,11 @@ export default function ListDetails() {
                             href={`${baseUrl}/${link.shortUrl}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group/btn w-full text-white font-bold text-sm md:text-base py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+                            className={`group/btn w-full text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-[1.02] ${
+                              link.ecommerceBrand.logo 
+                                ? 'p-0 overflow-hidden' 
+                                : 'text-xs md:text-sm py-2 md:py-3 px-3 md:px-4 gap-2'
+                            }`}
                             style={{
                               backgroundColor: link.ecommerceBrand.color || '#6366f1',
                               ...(link.ecommerceBrand.color ? {
@@ -282,14 +301,15 @@ export default function ListDetails() {
                               }
                             }}
                           >
-                            {link.ecommerceBrand.logo && (
+                            {link.ecommerceBrand.logo ? (
                               <img 
                                 src={link.ecommerceBrand.logo} 
                                 alt={link.ecommerceBrand.name}
-                                className="w-5 h-5 object-contain"
+                                className="w-full h-full object-cover"
                               />
+                            ) : (
+                              <span>{link.ecommerceBrand.name}'da Al</span>
                             )}
-                            <span>{link.ecommerceBrand.name}'da Al</span>
                           </a>
                         ) : (
                           <a
@@ -317,19 +337,9 @@ export default function ListDetails() {
         {/* Video Section - Show after products if available */}
         {embedUrl && (
           <div className="mt-16">
-            <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 overflow-hidden">
-               <div className="p-6 border-b border-gray-700 bg-gradient-to-r from-red-900/20 to-orange-900/20 flex items-center gap-3">
-                  <div className="p-3 bg-red-600 rounded-xl text-white shadow-lg">
-                    <Youtube size={28} />
-                  </div>
-                  <div>
-                     <h3 className="text-xl font-bold text-white">İnceleme Videosu</h3>
-                     <p className="text-sm text-gray-300">Bu liste ile ilgili detaylı incelemeyi izleyin.</p>
-                  </div>
-               </div>
-               
-               <div className="p-6 bg-gray-900">
-                 <div className="relative aspect-video w-full rounded-xl overflow-hidden shadow-2xl border-4 border-gray-700 bg-black">
+            <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 overflow-hidden max-w-3xl mx-auto">
+               <div className="p-4 md:p-6 bg-gray-900">
+                 <div className="relative aspect-video w-full rounded-xl overflow-hidden shadow-2xl border-2 border-gray-700 bg-black">
                    <iframe
                      src={embedUrl}
                      title="YouTube video player"
@@ -344,7 +354,10 @@ export default function ListDetails() {
         )}
       </div>
       
-      <ProfileHeader />
+      <div className="[&>section]:mb-0">
+        <ProfileHeader />
+        <Navbar />
+      </div>
     </div>
   );
 }
