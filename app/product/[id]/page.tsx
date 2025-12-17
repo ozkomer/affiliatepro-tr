@@ -185,7 +185,7 @@ export default function ProductDetail() {
                     {link.productUrls.map((productUrl) => (
                       <a
                         key={productUrl.id}
-                        href={`${baseUrl}/${link.shortUrl}`}
+                        href={productUrl.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group/btn w-full text-white font-bold text-lg md:text-xl py-4 md:py-5 px-6 md:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-[1.02]"

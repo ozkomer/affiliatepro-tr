@@ -28,6 +28,22 @@ export async function GET(
             name: true,
           },
         },
+        productUrls: {
+          include: {
+            ecommerceBrand: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                color: true,
+              },
+            },
+          },
+          orderBy: [
+            { isPrimary: 'desc' },
+            { order: 'asc' },
+          ],
+        },
       },
     });
 
@@ -49,6 +65,22 @@ export async function GET(
               id: true,
               name: true,
             },
+          },
+          productUrls: {
+            include: {
+              ecommerceBrand: {
+                select: {
+                  id: true,
+                  name: true,
+                  logo: true,
+                  color: true,
+                },
+              },
+            },
+            orderBy: [
+              { isPrimary: 'desc' },
+              { order: 'asc' },
+            ],
           },
         },
       });

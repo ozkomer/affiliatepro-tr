@@ -31,6 +31,22 @@ export async function GET(
                     color: true,
                   },
                 },
+                productUrls: {
+                  include: {
+                    ecommerceBrand: {
+                      select: {
+                        id: true,
+                        name: true,
+                        logo: true,
+                        color: true,
+                      },
+                    },
+                  },
+                  orderBy: [
+                    { isPrimary: 'desc' },
+                    { order: 'asc' },
+                  ],
+                },
               },
             },
           },

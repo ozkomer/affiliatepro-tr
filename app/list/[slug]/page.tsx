@@ -7,11 +7,24 @@ import Image from 'next/image';
 import { ArrowLeft, Share2, Youtube, ExternalLink, ShoppingCart } from 'lucide-react';
 import { ProfileHeader } from '@/components/ProfileHeader';
 
+interface ProductUrl {
+  id: string;
+  url: string;
+  isPrimary: boolean;
+  order: number;
+  ecommerceBrand: {
+    id: string;
+    name: string;
+    logo: string | null;
+    color: string | null;
+  };
+}
+
 interface AffiliateLink {
   id: string;
   title: string;
   description: string | null;
-  originalUrl: string;
+  originalUrl: string | null;
   shortUrl: string;
   imageUrl: string | null;
   ecommerceBrand: {
@@ -20,6 +33,7 @@ interface AffiliateLink {
     logo: string | null;
     color: string | null;
   } | null;
+  productUrls?: ProductUrl[];
 }
 
 interface CuratedList {
@@ -204,39 +218,89 @@ export default function ListDetails() {
                         </p>
                       )}
                       
-                      {/* Get it now Button - Geni.us Style */}
-                      <div className="mt-auto">
-                        <a
-                          href={`${baseUrl}/${link.shortUrl}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group/btn w-full text-white font-bold text-sm md:text-base py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-[1.02]"
-                          style={{
-                            backgroundColor: link.ecommerceBrand?.color || '#6366f1',
-                            ...(link.ecommerceBrand?.color ? {
-                              background: `linear-gradient(to right, ${link.ecommerceBrand.color}, ${link.ecommerceBrand.color}dd)`,
-                            } : {
-                              background: 'linear-gradient(to right, #6366f1, #9333ea)',
-                            })
-                          }}
-                          onMouseEnter={(e) => {
-                            if (link.ecommerceBrand?.color) {
-                              e.currentTarget.style.background = `linear-gradient(to right, ${link.ecommerceBrand.color}dd, ${link.ecommerceBrand.color}bb)`;
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (link.ecommerceBrand?.color) {
-                              e.currentTarget.style.background = `linear-gradient(to right, ${link.ecommerceBrand.color}, ${link.ecommerceBrand.color}dd)`;
-                            }
-                          }}
-                        >
-                          <span>
-                            {link.ecommerceBrand 
-                              ? link.ecommerceBrand.name
-                              : 'Satın Al'
-                            }
-                          </span>
-                        </a>
+                      {/* Get it now Buttons - Geni.us Style with multiple e-commerce support */}
+                      <div className="mt-auto space-y-2">
+                        {link.productUrls && link.productUrls.length > 0 ? (
+                          link.productUrls.map((productUrl) => (
+                            <a
+                              key={productUrl.id}
+                              href={productUrl.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group/btn w-full text-white font-bold text-sm md:text-base py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+                              style={{
+                                backgroundColor: productUrl.ecommerceBrand.color || '#6366f1',
+                                ...(productUrl.ecommerceBrand.color ? {
+                                  background: `linear-gradient(to right, ${productUrl.ecommerceBrand.color}, ${productUrl.ecommerceBrand.color}dd)`,
+                                } : {
+                                  background: 'linear-gradient(to right, #6366f1, #9333ea)',
+                                })
+                              }}
+                              onMouseEnter={(e) => {
+                                if (productUrl.ecommerceBrand.color) {
+                                  e.currentTarget.style.background = `linear-gradient(to right, ${productUrl.ecommerceBrand.color}dd, ${productUrl.ecommerceBrand.color}bb)`;
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (productUrl.ecommerceBrand.color) {
+                                  e.currentTarget.style.background = `linear-gradient(to right, ${productUrl.ecommerceBrand.color}, ${productUrl.ecommerceBrand.color}dd)`;
+                                }
+                              }}
+                            >
+                              {productUrl.ecommerceBrand.logo && (
+                                <img 
+                                  src={productUrl.ecommerceBrand.logo} 
+                                  alt={productUrl.ecommerceBrand.name}
+                                  className="w-5 h-5 object-contain"
+                                />
+                              )}
+                              <span>{productUrl.ecommerceBrand.name}'da Al</span>
+                            </a>
+                          ))
+                        ) : link.ecommerceBrand ? (
+                          <a
+                            href={`${baseUrl}/${link.shortUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group/btn w-full text-white font-bold text-sm md:text-base py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+                            style={{
+                              backgroundColor: link.ecommerceBrand.color || '#6366f1',
+                              ...(link.ecommerceBrand.color ? {
+                                background: `linear-gradient(to right, ${link.ecommerceBrand.color}, ${link.ecommerceBrand.color}dd)`,
+                              } : {
+                                background: 'linear-gradient(to right, #6366f1, #9333ea)',
+                              })
+                            }}
+                            onMouseEnter={(e) => {
+                              if (link.ecommerceBrand?.color) {
+                                e.currentTarget.style.background = `linear-gradient(to right, ${link.ecommerceBrand.color}dd, ${link.ecommerceBrand.color}bb)`;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (link.ecommerceBrand?.color) {
+                                e.currentTarget.style.background = `linear-gradient(to right, ${link.ecommerceBrand.color}, ${link.ecommerceBrand.color}dd)`;
+                              }
+                            }}
+                          >
+                            {link.ecommerceBrand.logo && (
+                              <img 
+                                src={link.ecommerceBrand.logo} 
+                                alt={link.ecommerceBrand.name}
+                                className="w-5 h-5 object-contain"
+                              />
+                            )}
+                            <span>{link.ecommerceBrand.name}'da Al</span>
+                          </a>
+                        ) : (
+                          <a
+                            href={`${baseUrl}/${link.shortUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group/btn w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm md:text-base py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+                          >
+                            <span>Satın Al</span>
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
