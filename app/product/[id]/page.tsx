@@ -168,7 +168,7 @@ export default function ProductDetail() {
               <div className="mt-auto border-t border-gray-700 pt-6">
                 {link.ecommerceBrand ? (
                   <a
-                    href={`${baseUrl}/l/${link.shortUrl}`}
+                    href={`${baseUrl}/${link.shortUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group/btn w-full text-white font-bold text-lg md:text-xl py-4 md:py-5 px-6 md:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-[1.02]"
@@ -195,7 +195,7 @@ export default function ProductDetail() {
                   </a>
                 ) : (
                   <a
-                    href={`${baseUrl}/l/${link.shortUrl}`}
+                    href={`${baseUrl}/${link.shortUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group/btn w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-lg md:text-xl py-4 md:py-5 px-6 md:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-[1.02]"

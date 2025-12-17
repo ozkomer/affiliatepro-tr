@@ -207,7 +207,7 @@ export default function ListDetails() {
                       {/* Get it now Button - Geni.us Style */}
                       <div className="mt-auto">
                         <a
-                          href={`${baseUrl}/l/${link.shortUrl}`}
+                          href={`${baseUrl}/${link.shortUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="group/btn w-full text-white font-bold text-sm md:text-base py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-[1.02]"
