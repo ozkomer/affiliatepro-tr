@@ -4,14 +4,27 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ExternalLink, ShoppingCart, Share2, Tag, Youtube } from 'lucide-react';
+import { ExternalLink, Share2, Tag, Youtube } from 'lucide-react';
 import { ProfileHeader } from '@/components/ProfileHeader';
+
+interface ProductUrl {
+  id: string;
+  url: string;
+  isPrimary: boolean;
+  order: number;
+  ecommerceBrand: {
+    id: string;
+    name: string;
+    logo: string | null;
+    color: string | null;
+  };
+}
 
 interface AffiliateLink {
   id: string;
   title: string;
   description: string | null;
-  originalUrl: string;
+  originalUrl: string | null;
   shortUrl: string;
   imageUrl: string | null;
   youtubeUrl: string | null;
@@ -25,6 +38,7 @@ interface AffiliateLink {
     id: string;
     name: string;
   } | null;
+  productUrls?: ProductUrl[];
 }
 
 export default function ProductDetail() {
@@ -136,7 +150,7 @@ export default function ProductDetail() {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-500">
-                    <ShoppingCart size={80} />
+                    <ExternalLink size={80} />
                   </div>
                 )}
               </div>
@@ -164,9 +178,48 @@ export default function ProductDetail() {
                 </div>
               )}
 
-              {/* Affiliate Link Button */}
+              {/* Affiliate Link Buttons */}
               <div className="mt-auto border-t border-gray-700 pt-6">
-                {link.ecommerceBrand ? (
+                {link.productUrls && link.productUrls.length > 0 ? (
+                  <div className="space-y-3">
+                    {link.productUrls.map((productUrl) => (
+                      <a
+                        key={productUrl.id}
+                        href={`${baseUrl}/${link.shortUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group/btn w-full text-white font-bold text-lg md:text-xl py-4 md:py-5 px-6 md:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-[1.02]"
+                        style={{
+                          backgroundColor: productUrl.ecommerceBrand.color || '#6366f1',
+                          ...(productUrl.ecommerceBrand.color ? {
+                            background: `linear-gradient(to right, ${productUrl.ecommerceBrand.color}, ${productUrl.ecommerceBrand.color}dd)`,
+                          } : {
+                            background: 'linear-gradient(to right, #6366f1, #9333ea)',
+                          })
+                        }}
+                        onMouseEnter={(e) => {
+                          if (productUrl.ecommerceBrand.color) {
+                            e.currentTarget.style.background = `linear-gradient(to right, ${productUrl.ecommerceBrand.color}dd, ${productUrl.ecommerceBrand.color}bb)`;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (productUrl.ecommerceBrand.color) {
+                            e.currentTarget.style.background = `linear-gradient(to right, ${productUrl.ecommerceBrand.color}, ${productUrl.ecommerceBrand.color}dd)`;
+                          }
+                        }}
+                      >
+                        {productUrl.ecommerceBrand.logo && (
+                          <img 
+                            src={productUrl.ecommerceBrand.logo} 
+                            alt={productUrl.ecommerceBrand.name}
+                            className="w-6 h-6 object-contain"
+                          />
+                        )}
+                        <span>{productUrl.ecommerceBrand.name}'da Al</span>
+                      </a>
+                    ))}
+                  </div>
+                ) : link.ecommerceBrand ? (
                   <a
                     href={`${baseUrl}/${link.shortUrl}`}
                     target="_blank"
@@ -191,7 +244,14 @@ export default function ProductDetail() {
                       }
                     }}
                   >
-                    <span>{link.ecommerceBrand.name}</span>
+                    {link.ecommerceBrand.logo && (
+                      <img 
+                        src={link.ecommerceBrand.logo} 
+                        alt={link.ecommerceBrand.name}
+                        className="w-6 h-6 object-contain"
+                      />
+                    )}
+                    <span>{link.ecommerceBrand.name}'da Al</span>
                   </a>
                 ) : (
                   <a
@@ -251,4 +311,3 @@ export default function ProductDetail() {
     </div>
   );
 }
-
