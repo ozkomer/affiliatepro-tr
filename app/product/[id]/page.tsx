@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
 import { ProfileHeader } from '@/components/ProfileHeader';
-import { Navbar } from '@/components/Navbar';
 
 interface ProductUrl {
   id: string;
@@ -84,7 +83,6 @@ export default function ProductDetail() {
           <div className="text-center text-gray-400">Yükleniyor...</div>
         </div>
         <ProfileHeader />
-        <Navbar />
       </div>
     );
   }
@@ -102,7 +100,6 @@ export default function ProductDetail() {
           </div>
         </div>
         <ProfileHeader />
-        <Navbar />
       </div>
     );
   }
@@ -296,7 +293,6 @@ export default function ProductDetail() {
       
       <div className="relative z-10">
         <ProfileHeader />
-        <Navbar />
       </div>
     </div>
   );
