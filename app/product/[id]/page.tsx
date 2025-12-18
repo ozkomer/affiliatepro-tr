@@ -148,7 +148,7 @@ export default function ProductDetail() {
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         {/* Product Image */}
         <div className="mb-8 flex justify-center">
-          <div className="relative w-full max-w-2xl aspect-square overflow-hidden">
+          <div className="relative w-full max-w-xl aspect-square overflow-hidden">
             {link.imageUrl ? (
               <Image
                 src={link.imageUrl}
