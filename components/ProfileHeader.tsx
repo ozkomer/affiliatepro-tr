@@ -1,7 +1,19 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Zap, Instagram, Youtube, Send } from 'lucide-react';
+
+interface UserProfile {
+  name: string;
+  bio: string | null;
+  profileImageUrl: string | null;
+  attentionText: string | null;
+  instagramUrl: string | null;
+  youtubeUrl: string | null;
+  tiktokUrl: string | null;
+  whatsappUrl: string | null;
+  telegramUrl: string | null;
+}
 
 // Özel TikTok İkonu
 const TikTokIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
@@ -39,27 +51,57 @@ const WhatsAppIcon = ({ size = 24, className = "" }: { size?: number, className?
 );
 
 export const ProfileHeader: React.FC = () => {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch('/api/profile');
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Default values if profile is not loaded yet
+  const displayName = profile?.name || 'Enes Özen';
+  const displayBio = profile?.bio || 'Teknoloji tutkunu, içerik üreticisi ve en iyi fırsat avcısı.';
+  const displayImageUrl = profile?.profileImageUrl || 'https://yt3.googleusercontent.com/0JmZ86WmvyvkZYLZggr8BBwZanH5TLJFrBQaaujNbHbGxoPWXGQydEk8Yie3MTXCeh9j1qc5KA=s160-c-k-c0x00ffffff-no-rj';
+  const displayAttentionText = profile?.attentionText || 'Gerçek indirim ve fırsatları kaçırmamak için indirim kanallarını takip etmeyi unutma!';
+
   return (
     <section className="bg-gray-800 border-b border-gray-700 pb-8 pt-6 px-4 mb-6">
       <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
         <div className="w-20 h-20 md:w-24 md:h-24 bg-indigo-900/50 rounded-full p-1 mb-3 shadow-md ring-2 ring-indigo-800/50">
-           {/* Placeholder for Profile Image */}
            <img 
-             src="https://yt3.googleusercontent.com/0JmZ86WmvyvkZYLZggr8BBwZanH5TLJFrBQaaujNbHbGxoPWXGQydEk8Yie3MTXCeh9j1qc5KA=s160-c-k-c0x00ffffff-no-rj" 
-             alt="Enes Özen" 
+             src={displayImageUrl} 
+             alt={displayName} 
              className="w-full h-full object-cover rounded-full"
            />
         </div>
         
-        <h1 className="text-xl md:text-2xl font-bold text-gray-100 mb-1">Enes Özen</h1>
-        <p className="text-gray-400 mb-4 max-w-md text-sm">
-          Teknoloji tutkunu, içerik üreticisi ve en iyi fırsat avcısı.
-        </p>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-100 mb-1">{displayName}</h1>
+        {displayBio && (
+          <p className="text-gray-400 mb-4 max-w-md text-sm">
+            {displayBio}
+          </p>
+        )}
 
         {/* Attention Text - Orange & Blinking */}
-        <p className="text-xs md:text-sm font-bold text-orange-400 animate-pulse mb-5 max-w-lg px-2">
-          Gerçek indirim ve fırsatları kaçırmamak için indirim kanallarını takip etmeyi unutma!
-        </p>
+        {displayAttentionText && (
+          <p className="text-xs md:text-sm font-bold text-orange-400 animate-pulse mb-5 max-w-lg px-2">
+            {displayAttentionText}
+          </p>
+        )}
         
         {/* Links Container - Mobilde yan yana (flex-row), boşluklar ve boyutlar küçültüldü */}
         <div className="flex flex-row gap-2 sm:gap-3 w-full max-w-xl justify-center">
@@ -68,38 +110,44 @@ export const ProfileHeader: React.FC = () => {
           <div className="flex-1 bg-gray-700/50 rounded-xl p-2 sm:p-3 border border-gray-600 shadow-sm flex flex-col items-center justify-center">
             <h3 className="text-[10px] sm:text-xs font-bold text-gray-300 mb-1.5 sm:mb-2 uppercase tracking-wide">Sosyal Medya</h3>
             <div className="flex justify-center gap-2 sm:gap-3">
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="group"
-              >
-                <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-pink-500 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-pink-900/30 transition-all">
-                  <Instagram size={20} />
-                </div>
-              </a>
+              {profile?.instagramUrl && (
+                <a 
+                  href={profile.instagramUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="group"
+                >
+                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-pink-500 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-pink-900/30 transition-all">
+                    <Instagram size={20} />
+                  </div>
+                </a>
+              )}
 
-              <a 
-                href="https://youtube.com" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="group"
-              >
-                <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-red-500 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-red-900/30 transition-all">
-                  <Youtube size={20} />
-                </div>
-              </a>
+              {profile?.youtubeUrl && (
+                <a 
+                  href={profile.youtubeUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="group"
+                >
+                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-red-500 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-red-900/30 transition-all">
+                    <Youtube size={20} />
+                  </div>
+                </a>
+              )}
 
-              <a 
-                href="https://tiktok.com" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="group"
-              >
-                <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-gray-200 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-gray-700 transition-all">
-                  <TikTokIcon size={20} />
-                </div>
-              </a>
+              {profile?.tiktokUrl && (
+                <a 
+                  href={profile.tiktokUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="group"
+                >
+                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-gray-200 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-gray-700 transition-all">
+                    <TikTokIcon size={20} />
+                  </div>
+                </a>
+              )}
             </div>
           </div>
 
@@ -109,27 +157,31 @@ export const ProfileHeader: React.FC = () => {
                <Zap size={10} className="fill-indigo-400 text-indigo-400 sm:w-3 sm:h-3" /> İndirim Kanalları
             </h3>
             <div className="flex justify-center gap-2 sm:gap-3">
-              <a 
-                href="https://whatsapp.com" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="group"
-              >
-                <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-green-400 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-green-900/30 transition-all">
-                  <WhatsAppIcon size={20} />
-                </div>
-              </a>
+              {profile?.whatsappUrl && (
+                <a 
+                  href={profile.whatsappUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="group"
+                >
+                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-green-400 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-green-900/30 transition-all">
+                    <WhatsAppIcon size={20} />
+                  </div>
+                </a>
+              )}
 
-              <a 
-                href="https://t.me" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="group"
-              >
-                <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-sky-400 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-sky-900/30 transition-all">
-                  <Send size={20} />
-                </div>
-              </a>
+              {profile?.telegramUrl && (
+                <a 
+                  href={profile.telegramUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="group"
+                >
+                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-sky-400 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-sky-900/30 transition-all">
+                    <Send size={20} />
+                  </div>
+                </a>
+              )}
             </div>
           </div>
 
