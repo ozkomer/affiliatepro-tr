@@ -148,17 +148,21 @@ export default function ProductDetail() {
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         {/* Product Image */}
         <div className="mb-8 flex justify-center">
-          <div className="relative w-full max-w-xl aspect-square overflow-hidden">
+          <div className="relative w-full max-w-xl overflow-hidden rounded-lg shadow-2xl bg-white/10 backdrop-blur-sm">
             {link.imageUrl ? (
-              <Image
-                src={link.imageUrl}
-                alt={link.title}
-                fill
-                className="object-cover"
-                unoptimized
-              />
+              <div className="relative w-full" style={{ aspectRatio: 'auto' }}>
+                <Image
+                  src={link.imageUrl}
+                  alt={link.title}
+                  width={800}
+                  height={800}
+                  className="w-full h-auto object-contain"
+                  unoptimized
+                  style={{ maxHeight: '70vh' }}
+                />
+              </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400 bg-white/10 backdrop-blur-sm">
+              <div className="w-full aspect-square flex items-center justify-center text-gray-400 bg-white/10 backdrop-blur-sm">
                 <ExternalLink size={80} />
               </div>
             )}
