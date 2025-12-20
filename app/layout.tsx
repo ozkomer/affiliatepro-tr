@@ -3,8 +3,13 @@ import "./globals.css";
 import { NavbarWrapper } from "@/components/NavbarWrapper";
 
 export const metadata: Metadata = {
-  title: "AffiliatePro - En İyi Ürün Tavsiyeleri",
+  title: "Enes Özen - En İyi Ürün Tavsiyeleri",
   description: "En iyi ürün tavsiyeleri ve affiliate linkler",
+  openGraph: {
+    title: "Enes Özen - En İyi Ürün Tavsiyeleri",
+    description: "En iyi ürün tavsiyeleri ve affiliate linkler",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
