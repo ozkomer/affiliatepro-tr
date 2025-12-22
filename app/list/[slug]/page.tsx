@@ -1,12 +1,9 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowLeft, Share2, ExternalLink, ShoppingCart } from 'lucide-react';
 import { ProfileHeader } from '@/components/ProfileHeader';
-import { Navbar } from '@/components/Navbar';
 
 interface ProductUrl {
   id: string;
@@ -58,10 +55,10 @@ interface CuratedList {
 
 export default function ListDetails() {
   const params = useParams();
-  const router = useRouter();
   const slug = params.slug as string;
   
   const [list, setList] = useState<CuratedList | null>(null);
+  const [profile, setProfile] = useState<{ youtubeUrl?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   
   // Base URL for affiliate links
@@ -72,26 +69,36 @@ export default function ListDetails() {
   useEffect(() => {
     if (slug) {
       fetchList();
+      fetchProfile();
     }
   }, [slug]);
 
   const fetchList = async () => {
     try {
       setLoading(true);
-      console.log('Fetching list with slug:', slug);
       const response = await fetch(`/api/lists/${slug}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('List data received:', data);
         setList(data);
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Failed to fetch list:', response.statusText, errorData);
+        console.error('Failed to fetch list:', response.statusText);
       }
     } catch (error) {
       console.error('Error fetching list:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch('/api/profile');
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
     }
   };
 
@@ -122,25 +129,29 @@ export default function ListDetails() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-6 pb-12">
-        <ProfileHeader />
-        <div className="max-w-7xl mx-auto px-4 w-full">
-          <div className="text-center text-gray-400 py-20">Yükleniyor...</div>
+      <div className="min-h-screen bg-white font-system flex flex-col">
+        <div className="flex justify-center py-5 px-5 flex-grow">
+          <div className="w-full max-w-[400px] text-center">
+            <div className="text-gray-400 py-20">Yükleniyor...</div>
+          </div>
         </div>
+        <ProfileHeader />
       </div>
     );
   }
 
   if (!list) {
     return (
-      <div className="flex flex-col gap-6 pb-12">
-        <ProfileHeader />
-        <div className="max-w-7xl mx-auto px-4 w-full">
-          <div className="text-center text-gray-400 py-20">
-            <h2 className="text-2xl font-bold text-gray-200 mb-4">Liste Bulunamadı</h2>
-            <Link href="/" className="text-indigo-400 hover:underline">Ana Sayfaya Dön</Link>
+      <div className="min-h-screen bg-white font-system flex flex-col">
+        <div className="flex justify-center py-5 px-5 flex-grow">
+          <div className="w-full max-w-[400px] text-center">
+            <div className="text-gray-400 py-20">
+              <h2 className="text-2xl font-bold text-[#1a1a1a] mb-4">Liste Bulunamadı</h2>
+              <Link href="/" className="text-indigo-600 hover:underline">Ana Sayfaya Dön</Link>
+            </div>
           </div>
         </div>
+        <ProfileHeader />
       </div>
     );
   }
@@ -150,215 +161,165 @@ export default function ListDetails() {
     .filter(item => item.link !== null)
     .sort((a, b) => a.order - b.order);
 
-  const embedUrl = list.youtubeUrl ? getYouTubeEmbedUrl(list.youtubeUrl) : null;
+  // Get primary product URLs for Amazon and Hepsiburada
+  const getPrimaryUrls = (link: AffiliateLink) => {
+    const amazonUrl = link.productUrls?.find(pu => 
+      pu.ecommerceBrand.name.toLowerCase().includes('amazon')
+    );
+    const hepsiburadaUrl = link.productUrls?.find(pu => 
+      pu.ecommerceBrand.name.toLowerCase().includes('hepsiburada')
+    );
+    return { amazonUrl, hepsiburadaUrl };
+  };
+
+  // Get YouTube embed URL
+  const youtubeUrl = list.youtubeUrl || profile?.youtubeUrl;
+  const embedUrl = youtubeUrl ? getYouTubeEmbedUrl(youtubeUrl) : null;
 
   return (
-    <div className="min-h-screen bg-gray-950">
-      {/* Hero Section - Geni.us Style */}
-      <div 
-        className="relative text-white py-8 md:py-12 overflow-hidden"
-        style={{
-          backgroundImage: list.coverImage ? `url(${list.coverImage})` : 'linear-gradient(to bottom, rgb(17 24 39), rgb(3 7 18))',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
-        
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">{list.title}</h1>
-          {list.description && (
-            <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed mb-6">
-              {list.description}
-            </p>
+    <div className="min-h-screen bg-white font-system flex flex-col">
+      <div className="flex justify-center py-5 px-5 flex-grow">
+        <div className="w-full max-w-[400px] text-center">
+          {/* Header Title */}
+          <div className="text-[1.1rem] font-bold mb-6 text-[#1a1a1a] uppercase">
+            {list.title}
+          </div>
+
+          {/* Product Grid */}
+          <div className="flex flex-wrap gap-2.5 justify-center">
+            {sortedLinks.length > 0 ? (
+              sortedLinks.map((item) => {
+                const link = item.link;
+                if (!link) return null;
+
+                const { amazonUrl, hepsiburadaUrl } = getPrimaryUrls(link);
+                const hasUrls = amazonUrl || hepsiburadaUrl || (link.productUrls && link.productUrls.length > 0);
+
+                return (
+                  <Link
+                    key={item.id}
+                    href={`/product/${link.shortUrl}`}
+                    className="w-[calc(50%-5px)] max-w-[180px] bg-white border border-[#ddd] rounded flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  >
+                    {/* Image Container */}
+                    <div className="w-full h-[130px] bg-white flex items-center justify-center p-2.5 box-border border-b border-[#f0f0f0]">
+                      {link.imageUrl ? (
+                        <img 
+                          src={link.imageUrl} 
+                          alt={link.title}
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="p-2.5 flex-grow flex flex-col justify-between text-center">
+                      {/* Product Name */}
+                      <div className="text-[13px] font-semibold text-[#333] mb-2 leading-[1.3] line-clamp-2">
+                        {link.title}
+                      </div>
+
+                      {/* Store Buttons */}
+                      {hasUrls && (
+                        <div className="space-y-1" onClick={(e) => e.stopPropagation()}>
+                          {amazonUrl && (
+                            <a 
+                              href={amazonUrl.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center justify-center bg-white border border-[#ddd] rounded p-1.5 mt-1 no-underline shadow-sm hover:shadow-md transition-shadow"
+                            >
+                              <img 
+                                src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
+                                alt="Amazon"
+                                className="h-6 w-auto"
+                              />
+                            </a>
+                          )}
+                          {hepsiburadaUrl && (
+                            <a 
+                              href={hepsiburadaUrl.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center justify-center bg-white border border-[#ddd] rounded p-1.5 mt-1 no-underline shadow-sm hover:shadow-md transition-shadow"
+                            >
+                              <img 
+                                src="https://upload.wikimedia.org/wikipedia/commons/2/20/Hepsiburada_logo_official.svg" 
+                                alt="Hepsiburada"
+                                className="h-6 w-auto"
+                              />
+                            </a>
+                          )}
+                          {/* Fallback: Show first 2 product URLs if Amazon/Hepsiburada not found */}
+                          {!amazonUrl && !hepsiburadaUrl && link.productUrls && link.productUrls.length > 0 && (
+                            <>
+                              {link.productUrls.slice(0, 2).map((productUrl) => (
+                                <a
+                                  key={productUrl.id}
+                                  href={productUrl.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="flex items-center justify-center bg-white border border-[#ddd] rounded p-1.5 mt-1 no-underline shadow-sm hover:shadow-md transition-shadow"
+                                >
+                                  {productUrl.ecommerceBrand.logo ? (
+                                    <img 
+                                      src={productUrl.ecommerceBrand.logo} 
+                                      alt={productUrl.ecommerceBrand.name}
+                                      className="h-6 w-auto"
+                                    />
+                                  ) : (
+                                    <span className="text-xs font-semibold">{productUrl.ecommerceBrand.name}</span>
+                                  )}
+                                </a>
+                              ))}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })
+            ) : (
+              <div className="w-full text-center py-20">
+                <p className="text-gray-400">Bu listeye henüz ürün eklenmemiş.</p>
+              </div>
+            )}
+          </div>
+
+          {/* YouTube Video Section */}
+          {embedUrl && (
+            <div className="mb-6 mt-8">
+              <div className="relative aspect-video w-full rounded overflow-hidden bg-black border border-[#ddd]">
+                <iframe
+                  src={embedUrl}
+                  title="YouTube video player"
+                  className="absolute top-0 left-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
           )}
-          {list.category && (
-            <span className="inline-block px-4 py-2 bg-indigo-600/20 text-indigo-300 rounded-full text-sm font-semibold border border-indigo-500/30">
-              {list.category.name}
-            </span>
-          )}
+
+          {/* Footer - Komisyon Yazısı */}
+          <div className="text-[11px] text-[#aaa] mt-7.5 mb-5">
+            *Linkler üzerinden yapacağınız alışverişlerden komisyon kazanırım.
+          </div>
         </div>
       </div>
 
-      {/* Products Section - Geni.us Style */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {sortedLinks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {sortedLinks.map((item, index) => {
-              const link = item.link;
-              if (!link) return null;
-
-              return (
-                <div key={item.id} className="group flex flex-col h-full">
-                  {/* Product Card - Geni.us Style */}
-                  <div className="bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-700 hover:shadow-3xl hover:border-gray-600 transition-all duration-500 flex flex-col h-full">
-                    {/* Product Image - Large and Centered - Clickable */}
-                    <Link 
-                      href={`/product/${link.shortUrl}`}
-                      className="relative w-full h-40 md:h-48 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden cursor-pointer"
-                    >
-                      {link.imageUrl ? (
-                        <Image
-                          src={link.imageUrl}
-                          alt={link.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-700"
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-500">
-                          <ShoppingCart size={80} />
-                        </div>
-                      )}
-                    </Link>
-                    
-                    {/* Product Content */}
-                    <div className="p-3 md:p-4 bg-gray-800 flex flex-col flex-grow">
-                      <Link href={`/product/${link.shortUrl}`}>
-                        <h2 className="text-base md:text-lg font-bold text-white mb-2 leading-tight line-clamp-2 hover:text-indigo-400 transition-colors cursor-pointer">
-                          {link.title}
-                        </h2>
-                      </Link>
-                      
-                      {link.description && (
-                        <p className="text-gray-300 text-xs md:text-sm mb-3 leading-relaxed line-clamp-2 flex-grow">
-                          {link.description}
-                        </p>
-                      )}
-                      
-                      {/* Get it now Buttons - Geni.us Style with multiple e-commerce support */}
-                      <div className="mt-auto space-y-2">
-                        {link.productUrls && link.productUrls.length > 0 ? (
-                          link.productUrls.map((productUrl) => (
-                            <a
-                              key={productUrl.id}
-                              href={productUrl.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`group/btn w-full text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-[1.02] ${
-                                productUrl.ecommerceBrand.logo 
-                                  ? 'p-0 overflow-hidden' 
-                                  : 'text-xs md:text-sm py-2 md:py-3 px-3 md:px-4 gap-2'
-                              }`}
-                              style={{
-                                backgroundColor: productUrl.ecommerceBrand.color || '#6366f1',
-                                ...(productUrl.ecommerceBrand.color ? {
-                                  background: `linear-gradient(to right, ${productUrl.ecommerceBrand.color}, ${productUrl.ecommerceBrand.color}dd)`,
-                                } : {
-                                  background: 'linear-gradient(to right, #6366f1, #9333ea)',
-                                })
-                              }}
-                              onMouseEnter={(e) => {
-                                if (productUrl.ecommerceBrand.color) {
-                                  e.currentTarget.style.background = `linear-gradient(to right, ${productUrl.ecommerceBrand.color}dd, ${productUrl.ecommerceBrand.color}bb)`;
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (productUrl.ecommerceBrand.color) {
-                                  e.currentTarget.style.background = `linear-gradient(to right, ${productUrl.ecommerceBrand.color}, ${productUrl.ecommerceBrand.color}dd)`;
-                                }
-                              }}
-                            >
-                              {productUrl.ecommerceBrand.logo ? (
-                                <img 
-                                  src={productUrl.ecommerceBrand.logo} 
-                                  alt={productUrl.ecommerceBrand.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <span>{productUrl.ecommerceBrand.name}'da Al</span>
-                              )}
-                            </a>
-                          ))
-                        ) : link.ecommerceBrand ? (
-                          <a
-                            href={`${baseUrl}/${link.shortUrl}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`group/btn w-full text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-[1.02] ${
-                              link.ecommerceBrand.logo 
-                                ? 'p-0 overflow-hidden' 
-                                : 'text-xs md:text-sm py-2 md:py-3 px-3 md:px-4 gap-2'
-                            }`}
-                            style={{
-                              backgroundColor: link.ecommerceBrand.color || '#6366f1',
-                              ...(link.ecommerceBrand.color ? {
-                                background: `linear-gradient(to right, ${link.ecommerceBrand.color}, ${link.ecommerceBrand.color}dd)`,
-                              } : {
-                                background: 'linear-gradient(to right, #6366f1, #9333ea)',
-                              })
-                            }}
-                            onMouseEnter={(e) => {
-                              if (link.ecommerceBrand?.color) {
-                                e.currentTarget.style.background = `linear-gradient(to right, ${link.ecommerceBrand.color}dd, ${link.ecommerceBrand.color}bb)`;
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (link.ecommerceBrand?.color) {
-                                e.currentTarget.style.background = `linear-gradient(to right, ${link.ecommerceBrand.color}, ${link.ecommerceBrand.color}dd)`;
-                              }
-                            }}
-                          >
-                            {link.ecommerceBrand.logo ? (
-                              <img 
-                                src={link.ecommerceBrand.logo} 
-                                alt={link.ecommerceBrand.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <span>{link.ecommerceBrand.name}'da Al</span>
-                            )}
-                          </a>
-                        ) : (
-                          <a
-                            href={`${baseUrl}/${link.shortUrl}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group/btn w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm md:text-base py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-[1.02]"
-                          >
-                            <span>Satın Al</span>
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="text-center py-20 bg-gray-800 rounded-2xl shadow-lg border border-gray-700">
-            <p className="text-gray-400 text-lg">Bu listeye henüz ürün eklenmemiş.</p>
-          </div>
-        )}
-
-        {/* Video Section - Show after products if available */}
-        {embedUrl && (
-          <div className="mt-16">
-            <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 overflow-hidden max-w-3xl mx-auto">
-               <div className="p-4 md:p-6 bg-gray-900">
-                 <div className="relative aspect-video w-full rounded-xl overflow-hidden shadow-2xl border-2 border-gray-700 bg-black">
-                   <iframe
-                     src={embedUrl}
-                     title="YouTube video player"
-                     className="absolute top-0 left-0 w-full h-full"
-                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                     allowFullScreen
-                   ></iframe>
-                 </div>
-               </div>
-            </div>
-          </div>
-        )}
-      </div>
-      
-      <div className="[&>section]:mb-0">
-        <ProfileHeader />
-        <Navbar />
-      </div>
+      {/* Profile Header - En Altta */}
+      <ProfileHeader />
     </div>
   );
 }
-

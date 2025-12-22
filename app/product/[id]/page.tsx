@@ -10,6 +10,7 @@ import { ProfileHeader } from '@/components/ProfileHeader';
 interface UserProfile {
   telegramUrl?: string;
   whatsappUrl?: string;
+  youtubeUrl?: string;
 }
 
 interface ProductUrl {
@@ -284,24 +285,28 @@ export default function ProductDetail() {
         </div>
 
         {/* YouTube Video Section */}
-        {link.youtubeUrl && (
-          <>
-            <div className="text-[15px] font-semibold text-[#333] mb-2.5">
-              İnceleme Videosunu İzle ↓
+        {(link.youtubeUrl || profile?.youtubeUrl) && (
+          <div className="bg-[#fcfcfc] border border-solid border-[#e0e0e0] p-5 px-4 mb-6 mt-8">
+            <div className="font-bold text-sm text-[#333] mb-1">
+              İnceleme Videosunu İzle
             </div>
-            <a 
-              href={link.youtubeUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex bg-white border border-[#ddd] rounded p-2 px-5 no-underline shadow-sm mb-8.75 hover:shadow-md transition-shadow"
-            >
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" 
-                alt="YouTube" 
-                className="h-5 w-auto"
-              />
-            </a>
-          </>
+            <div className="flex gap-2.5 mt-3">
+              <a 
+                href={link.youtubeUrl || profile?.youtubeUrl || '#'} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex-1 bg-white border border-[#ddd] rounded p-2.5 no-underline flex items-center justify-center hover:shadow-md transition-shadow"
+              >
+                <img 
+                  src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" 
+                  width={24}
+                  height={24}
+                  alt="YouTube"
+                  className="h-6 w-auto"
+                />
+              </a>
+            </div>
+          </div>
         )}
 
         {/* İndirim Kanalı Kutusu */}

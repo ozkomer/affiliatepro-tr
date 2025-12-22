@@ -125,7 +125,7 @@ function ProductListContent() {
 
   if (loading) {
     return (
-      <div>
+      <div className="min-h-screen bg-white font-system">
         <ProfileHeader />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
           <div className="text-center py-20 text-gray-400">Yükleniyor...</div>
@@ -135,7 +135,7 @@ function ProductListContent() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-white font-system">
       <ProfileHeader />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -147,13 +147,13 @@ function ProductListContent() {
               <button
                 key={category.id}
                 onClick={() => handleCategoryClick(category)}
-                className={`flex flex-col items-center justify-center min-w-[90px] p-2 rounded-xl border transition-all duration-200 group ${
+                className={`flex flex-col items-center justify-center min-w-[90px] p-2 border transition-all duration-200 group ${
                   selectedCategory === category.name 
-                    ? 'bg-indigo-900/30 border-indigo-500 shadow-sm' 
-                    : 'bg-gray-800 border-gray-700 hover:border-indigo-500 hover:bg-gray-700'
+                    ? 'bg-indigo-100 border-indigo-500 shadow-sm' 
+                    : 'bg-white border-[#ddd] hover:border-indigo-500 hover:bg-gray-100'
                 }`}
               >
-                <div className="w-10 h-10 rounded-full mb-2 overflow-hidden bg-gray-700 flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 rounded-full mb-2 overflow-hidden bg-white border border-[#ddd] flex items-center justify-center shadow-sm">
                   {category.imageUrl ? (
                      <img src={category.imageUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -165,7 +165,7 @@ function ProductListContent() {
                      </div>
                   )}
                 </div>
-                <span className={`text-[11px] font-bold text-center truncate w-full px-1 ${selectedCategory === category.name ? 'text-indigo-300' : 'text-gray-300 group-hover:text-indigo-400'}`}>
+                <span className={`text-[11px] font-bold text-center truncate w-full px-1 ${selectedCategory === category.name ? 'text-indigo-600' : 'text-[#333] group-hover:text-indigo-600'}`}>
                   {category.name}
                 </span>
               </button>
@@ -208,10 +208,10 @@ function ProductListContent() {
               );
             })
           ) : (
-            <div className="col-span-full text-center py-20 bg-gray-800 rounded-xl border border-dashed border-gray-700">
-              <Filter size={48} className="mx-auto text-gray-600 mb-4" />
-              <h3 className="text-lg font-medium text-gray-200">Bu kategoride henüz liste oluşturulmamış</h3>
-              <p className="text-gray-400 mt-2">Farklı bir kategori seçebilir veya yakında eklenecek listeleri bekleyebilirsiniz.</p>
+            <div className="col-span-full text-center py-20 bg-white rounded-xl border border-dashed border-[#ddd]">
+              <Filter size={48} className="mx-auto text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-[#333]">Bu kategoride henüz liste oluşturulmamış</h3>
+              <p className="text-gray-500 mt-2">Farklı bir kategori seçebilir veya yakında eklenecek listeleri bekleyebilirsiniz.</p>
             </div>
           )}
         </div>

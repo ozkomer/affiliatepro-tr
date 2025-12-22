@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { Zap, Instagram, Youtube, Send } from 'lucide-react';
 
 interface UserProfile {
   name: string;
@@ -14,41 +13,6 @@ interface UserProfile {
   whatsappUrl: string | null;
   telegramUrl: string | null;
 }
-
-// Özel TikTok İkonu
-const TikTokIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-  <svg 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
-  </svg>
-);
-
-// Özel WhatsApp İkonu
-const WhatsAppIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-  <svg 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
-    <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" />
-  </svg>
-);
 
 export const ProfileHeader: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -79,112 +43,147 @@ export const ProfileHeader: React.FC = () => {
   const displayAttentionText = profile?.attentionText || 'Gerçek indirim ve fırsatları kaçırmamak için indirim kanallarını takip etmeyi unutma!';
 
   return (
-    <section className="bg-gray-800 border-b border-gray-700 pb-8 pt-6 px-4 mb-6">
-      <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
-        <div className="w-20 h-20 md:w-24 md:h-24 bg-indigo-900/50 rounded-full p-1 mb-3 shadow-md ring-2 ring-indigo-800/50">
-           <img 
-             src={displayImageUrl} 
-             alt={displayName} 
-             className="w-full h-full object-cover rounded-full"
-           />
+    <section className="bg-white font-system py-5 px-5">
+      <div className="max-w-4xl mx-auto text-center">
+        {/* Profile Image */}
+        <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-2 border-[#ddd]">
+          <img 
+            src={displayImageUrl} 
+            alt={displayName} 
+            className="w-full h-full object-cover"
+          />
         </div>
         
-        <h1 className="text-xl md:text-2xl font-bold text-gray-100 mb-1">{displayName}</h1>
+        {/* Name */}
+        <h1 className="text-lg font-normal text-[#1a1a1a] mb-2">{displayName}</h1>
+        
+        {/* Bio */}
         {displayBio && (
-          <p className="text-gray-400 mb-4 max-w-md text-sm">
+          <p className="text-sm text-[#333] mb-4 leading-6 px-2.5">
             {displayBio}
           </p>
         )}
 
-        {/* Attention Text - Orange & Blinking */}
+        {/* Attention Text */}
         {displayAttentionText && (
-          <p className="text-xs md:text-sm font-bold text-orange-400 animate-pulse mb-5 max-w-lg px-2">
+          <p className="text-xs text-[#777] mb-6 px-2.5">
             {displayAttentionText}
           </p>
         )}
         
-        {/* Links Container - Mobilde yan yana (flex-row), boşluklar ve boyutlar küçültüldü */}
-        <div className="flex flex-row gap-2 sm:gap-3 w-full max-w-xl justify-center">
-          
-          {/* Sosyal Medya Grubu */}
-          <div className="flex-1 bg-gray-700/50 rounded-xl p-2 sm:p-3 border border-gray-600 shadow-sm flex flex-col items-center justify-center">
-            <h3 className="text-[10px] sm:text-xs font-bold text-gray-300 mb-1.5 sm:mb-2 uppercase tracking-wide">Sosyal Medya</h3>
-            <div className="flex justify-center gap-2 sm:gap-3">
-              {profile?.instagramUrl && (
-                <a 
-                  href={profile.instagramUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="group"
-                >
-                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-pink-500 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-pink-900/30 transition-all">
-                    <Instagram size={20} />
-                  </div>
-                </a>
-              )}
+        {/* Cards Container - Social Media and Discount Channels */}
+        <div className="flex gap-2.5">
+          {/* Social Media Links */}
+          {(profile?.instagramUrl || profile?.youtubeUrl || profile?.tiktokUrl) && (
+            <div className="flex-1 bg-[#fcfcfc] border border-solid border-[#e0e0e0] p-5 px-4">
+              <div className="font-bold text-sm text-[#333] mb-1">
+                Sosyal Medya
+              </div>
+              <div className="text-xs text-[#777] mb-4">
+                İçeriklerimi takip et, güncel kal.
+              </div>
+              <div className="flex flex-col gap-2.5 mt-3">
+                {profile.instagramUrl && (
+                  <a 
+                    href={profile.instagramUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full bg-white border border-[#ddd] rounded p-2.5 no-underline flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[#E4405F] hover:shadow-md transition-shadow"
+                  >
+                    <img 
+                      src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" 
+                      width={18}
+                      height={18}
+                      alt="Instagram"
+                    />
+                    Instagram
+                  </a>
+                )}
 
-              {profile?.youtubeUrl && (
-                <a 
-                  href={profile.youtubeUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="group"
-                >
-                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-red-500 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-red-900/30 transition-all">
-                    <Youtube size={20} />
-                  </div>
-                </a>
-              )}
+                {profile.youtubeUrl && (
+                  <a 
+                    href={profile.youtubeUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full bg-white border border-[#ddd] rounded p-2.5 no-underline flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[#FF0000] hover:shadow-md transition-shadow"
+                  >
+                    <img 
+                      src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" 
+                      width={18}
+                      height={18}
+                      alt="YouTube"
+                    />
+                    YouTube
+                  </a>
+                )}
 
-              {profile?.tiktokUrl && (
-                <a 
-                  href={profile.tiktokUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="group"
-                >
-                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-gray-200 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-gray-700 transition-all">
-                    <TikTokIcon size={20} />
-                  </div>
-                </a>
-              )}
+                {profile.tiktokUrl && (
+                  <a 
+                    href={profile.tiktokUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full bg-white border border-[#ddd] rounded p-2.5 no-underline flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[#000000] hover:shadow-md transition-shadow"
+                  >
+                    <svg 
+                      width={18} 
+                      height={18} 
+                      viewBox="0 0 24 24" 
+                      fill="currentColor"
+                    >
+                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.89 2.89 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                    </svg>
+                    TikTok
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* İndirim Kanalları Grubu */}
-          <div className="flex-1 bg-indigo-900/30 rounded-xl p-2 sm:p-3 border border-indigo-700/50 shadow-sm flex flex-col items-center justify-center">
-            <h3 className="text-[10px] sm:text-xs font-bold text-indigo-300 mb-1.5 sm:mb-2 uppercase tracking-wide flex items-center justify-center gap-1">
-               <Zap size={10} className="fill-indigo-400 text-indigo-400 sm:w-3 sm:h-3" /> İndirim Kanalları
-            </h3>
-            <div className="flex justify-center gap-2 sm:gap-3">
-              {profile?.whatsappUrl && (
-                <a 
-                  href={profile.whatsappUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="group"
-                >
-                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-green-400 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-green-900/30 transition-all">
-                    <WhatsAppIcon size={20} />
-                  </div>
-                </a>
-              )}
-
-              {profile?.telegramUrl && (
-                <a 
-                  href={profile.telegramUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="group"
-                >
-                  <div className="p-1.5 sm:p-2 bg-gray-800 rounded-full text-sky-400 shadow-sm border border-gray-600 group-hover:scale-110 group-hover:bg-sky-900/30 transition-all">
-                    <Send size={20} />
-                  </div>
-                </a>
-              )}
+          {/* Discount Channels */}
+          {(profile?.telegramUrl || profile?.whatsappUrl) && (
+            <div className="flex-1 bg-[#fcfcfc] border border-solid border-[#e0e0e0] p-5 px-4">
+            <div className="font-bold text-sm text-[#333] mb-1">
+              İndirim Kanalıma Katıl
             </div>
-          </div>
-
+            <div className="text-xs text-[#777] mb-4">
+              Anlık fırsatları yakala, kazançlı çık.
+            </div>
+              <div className="flex flex-col gap-2.5 mt-3">
+                {profile.telegramUrl && (
+                  <a 
+                    href={profile.telegramUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full bg-white border border-[#ddd] rounded p-2.5 no-underline flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[#0088cc] hover:shadow-md transition-shadow"
+                  >
+                    <img 
+                      src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" 
+                      width={18} 
+                      height={18} 
+                      alt="Telegram"
+                    />
+                    Telegram
+                  </a>
+                )}
+                {profile.whatsappUrl && (
+                  <a 
+                    href={profile.whatsappUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full bg-white border border-[#ddd] rounded p-2.5 no-underline flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[#25D366] hover:shadow-md transition-shadow"
+                  >
+                    <img 
+                      src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                      width={18} 
+                      height={18} 
+                      alt="WhatsApp"
+                    />
+                    WhatsApp
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

@@ -54,13 +54,13 @@ export default function AllLists() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-white font-system">
       <ProfileHeader />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div className="mb-10 text-center md:text-left">
-          <h1 className="text-3xl font-bold text-gray-100">Özel Listeler</h1>
-          <p className="text-gray-400 mt-2 text-lg">Konuya göre derlediğimiz en iyi ürün koleksiyonları.</p>
+          <h1 className="text-3xl font-bold text-[#1a1a1a]">Özel Listeler</h1>
+          <p className="text-gray-500 mt-2 text-lg">Konuya göre derlediğimiz en iyi ürün koleksiyonları.</p>
         </div>
 
         {loading ? (
@@ -103,7 +103,7 @@ export default function AllLists() {
               );
             })}
             {lists.length === 0 && (
-              <div className="col-span-full py-12 text-center text-gray-400 bg-gray-800 rounded-xl border border-dashed border-gray-700">
+              <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-[#ddd]">
                 Henüz liste bulunmamaktadır.
               </div>
             )}
