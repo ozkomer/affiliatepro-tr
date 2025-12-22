@@ -26,6 +26,7 @@ export interface Product {
 }
 
 export interface CuratedList {
+  showDirectLinks?: boolean;
   id: string;
   title: string;
   slug: string;

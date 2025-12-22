@@ -8,9 +8,10 @@ export async function GET(
   try {
     const { slug } = await params;
     
-    console.log('Fetching list with slug:', slug);
+    console.log('Fetching list with slug/shortUrl:', slug);
     
-    const list = await prisma.curatedList.findUnique({
+    // Try to find by slug first
+    let list = await prisma.curatedList.findUnique({
       where: { slug },
       include: {
         category: {
@@ -54,20 +55,103 @@ export async function GET(
             order: 'asc',
           },
         },
+        listUrls: {
+          include: {
+            ecommerceBrand: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                color: true,
+              },
+            },
+          },
+          orderBy: [
+            { isPrimary: 'desc' },
+            { order: 'asc' },
+          ],
+        },
       },
     });
 
+    // If not found by slug, try to find by shortUrl
     if (!list) {
-      console.log('List not found for slug:', slug);
-      // Try to find all lists to see what slugs exist
+      console.log('List not found with slug, trying shortUrl:', slug);
+      list = await prisma.curatedList.findUnique({
+        where: { shortUrl: slug },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          links: {
+            include: {
+              link: {
+                include: {
+                  ecommerceBrand: {
+                    select: {
+                      id: true,
+                      name: true,
+                      logo: true,
+                      color: true,
+                    },
+                  },
+                  productUrls: {
+                    include: {
+                      ecommerceBrand: {
+                        select: {
+                          id: true,
+                          name: true,
+                          logo: true,
+                          color: true,
+                        },
+                      },
+                    },
+                    orderBy: [
+                      { isPrimary: 'desc' },
+                      { order: 'asc' },
+                    ],
+                  },
+                },
+              },
+            },
+            orderBy: {
+              order: 'asc',
+            },
+          },
+          listUrls: {
+            include: {
+              ecommerceBrand: {
+                select: {
+                  id: true,
+                  name: true,
+                  logo: true,
+                  color: true,
+                },
+              },
+            },
+            orderBy: [
+              { isPrimary: 'desc' },
+              { order: 'asc' },
+            ],
+          },
+        },
+      });
+    }
+
+    if (!list) {
+      console.log('List not found for slug/shortUrl:', slug);
+      // Try to find all lists to see what slugs/shortUrls exist
       const allLists = await prisma.curatedList.findMany({
-        select: { slug: true, title: true },
+        select: { slug: true, shortUrl: true, title: true },
         take: 10,
       });
       console.log('Available lists (first 10):', allLists);
       
       return NextResponse.json(
-        { error: 'List not found', slug, availableSlugs: allLists.map(l => l.slug) },
+        { error: 'List not found', slug, availableSlugs: allLists.map(l => ({ slug: l.slug, shortUrl: l.shortUrl, title: l.title })) },
         { status: 404 }
       );
     }

@@ -12,6 +12,7 @@ interface List {
   coverImage: string | null;
   youtubeUrl: string | null;
   isFeatured: boolean;
+  showDirectLinks: boolean;
   categoryId: string | null;
   category: {
     id: string;
@@ -95,6 +96,7 @@ export default function AllLists() {
                     coverImage: list.coverImage || undefined,
                     youtubeUrl: list.youtubeUrl || undefined,
                     isFeatured: list.isFeatured,
+                    showDirectLinks: list.showDirectLinks,
                     createdAt: new Date(list.createdAt).getTime(),
                   }}
                   productCount={productCount}

@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
   try {
     console.log('Fetching lists for categoryId:', categoryId);
 
-    const where: any = {};
+    const where: any = {
+      isFeatured: true, // Only show featured lists
+    };
     if (categoryId) {
       where.categoryId = categoryId;
     }
@@ -56,6 +58,7 @@ export async function GET(request: NextRequest) {
       coverImage: list.coverImage,
       youtubeUrl: list.youtubeUrl,
       isFeatured: list.isFeatured,
+      showDirectLinks: list.showDirectLinks || false,
       categoryId: list.categoryId,
       category: list.category,
       links: list.links.map((linkItem: any) => ({
@@ -85,7 +88,7 @@ export async function GET(request: NextRequest) {
       await new Promise(resolve => setTimeout(resolve, 1000));
       try {
         const retryLists = await prisma.curatedList.findMany({
-          where: categoryId ? { categoryId } : {},
+          where: categoryId ? { categoryId, isFeatured: true } : { isFeatured: true },
           include: {
             category: {
               select: {

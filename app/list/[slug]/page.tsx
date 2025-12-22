@@ -34,6 +34,19 @@ interface AffiliateLink {
   productUrls?: ProductUrl[];
 }
 
+interface ListUrl {
+  id: string;
+  url: string;
+  isPrimary: boolean;
+  order: number;
+  ecommerceBrand: {
+    id: string;
+    name: string;
+    logo: string | null;
+    color: string | null;
+  };
+}
+
 interface CuratedList {
   id: string;
   title: string;
@@ -42,6 +55,7 @@ interface CuratedList {
   coverImage: string | null;
   youtubeUrl: string | null;
   isFeatured: boolean;
+  showDirectLinks: boolean;
   category: {
     id: string;
     name: string;
@@ -51,6 +65,7 @@ interface CuratedList {
     order: number;
     link: AffiliateLink | null;
   }>;
+  listUrls?: ListUrl[];
 }
 
 export default function ListDetails() {
@@ -58,7 +73,7 @@ export default function ListDetails() {
   const slug = params.slug as string;
   
   const [list, setList] = useState<CuratedList | null>(null);
-  const [profile, setProfile] = useState<{ youtubeUrl?: string } | null>(null);
+  const [profile, setProfile] = useState<{ youtubeUrl?: string; telegramUrl?: string; whatsappUrl?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   
   // Base URL for affiliate links
@@ -172,6 +187,18 @@ export default function ListDetails() {
     return { amazonUrl, hepsiburadaUrl };
   };
 
+  // Get primary list URLs for Amazon and Hepsiburada
+  const getPrimaryListUrls = () => {
+    if (!list.listUrls || list.listUrls.length === 0) return { amazonUrl: null, hepsiburadaUrl: null };
+    const amazonUrl = list.listUrls.find(lu => 
+      lu.ecommerceBrand.name.toLowerCase().includes('amazon')
+    );
+    const hepsiburadaUrl = list.listUrls.find(lu => 
+      lu.ecommerceBrand.name.toLowerCase().includes('hepsiburada')
+    );
+    return { amazonUrl, hepsiburadaUrl };
+  };
+
   // Get YouTube embed URL
   const youtubeUrl = list.youtubeUrl || profile?.youtubeUrl;
   const embedUrl = youtubeUrl ? getYouTubeEmbedUrl(youtubeUrl) : null;
@@ -185,8 +212,149 @@ export default function ListDetails() {
             {list.title}
           </div>
 
-          {/* Product Grid */}
-          <div className="flex flex-wrap gap-2.5 justify-center">
+          {/* List Cover Image */}
+          {list.coverImage && (
+            <div className="mb-6">
+              <img 
+                src={list.coverImage} 
+                alt={list.title}
+                className="w-full max-w-[300px] h-auto mx-auto"
+              />
+            </div>
+          )}
+
+          {/* List Description */}
+          {list.description && (
+            <div className="text-sm text-[#333] leading-6 mb-5 px-2.5">
+              {list.description}
+            </div>
+          )}
+
+          {/* List Direct Links OR Product Grid - Based on showDirectLinks flag */}
+          {list.showDirectLinks && list.listUrls && list.listUrls.length > 0 ? (
+            // Show New Design for List Links (showDirectLinks: true)
+            <div className="w-full">
+              {/* Update Badge */}
+              <div className="flex justify-center mb-2.5">
+                <div className="inline-flex items-center gap-1.5 bg-[#e6f4ea] text-[#1e8e3e] px-3 py-1.5 text-xs font-bold shadow-sm">
+                  <span className="w-2 h-2 bg-[#1e8e3e] rounded-full animate-pulse-dot"></span>
+                  Liste Güncellendi
+                </div>
+              </div>
+
+              {/* Main List Button - Links to list URLs */}
+              <div className="mb-10">
+                {(() => {
+                  const { amazonUrl, hepsiburadaUrl } = getPrimaryListUrls();
+                  const primaryUrl = amazonUrl || hepsiburadaUrl || (list.listUrls && list.listUrls[0]);
+                  
+                  if (primaryUrl) {
+                    const handleListClick = async (e: React.MouseEvent) => {
+                      e.preventDefault();
+                      
+                      console.log('🔵 List click handler triggered');
+                      console.log('🔵 Slug:', slug);
+                      console.log('🔵 Primary URL:', primaryUrl);
+                      console.log('🔵 List URL ID:', primaryUrl.id);
+                      
+                      // Track click - use slug from URL params, not list.slug
+                      try {
+                        const clickUrl = `/api/lists/${slug}/click`;
+                        console.log('🔵 Calling API:', clickUrl);
+                        
+                        const response = await fetch(clickUrl, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            listUrlId: primaryUrl.id,
+                          }),
+                        });
+                        
+                        console.log('🔵 Response status:', response.status);
+                        const responseData = await response.json();
+                        console.log('🔵 Response data:', responseData);
+                        
+                        if (!response.ok) {
+                          console.error('❌ Error tracking list click:', responseData);
+                        } else {
+                          console.log('✅ Click tracked successfully');
+                        }
+                      } catch (error) {
+                        console.error('❌ Error tracking list click:', error);
+                      }
+                      
+                      // Open URL
+                      window.open(primaryUrl.url, '_blank', 'noopener,noreferrer');
+                    };
+                    
+                    return (
+                      <a 
+                        href={primaryUrl.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={handleListClick}
+                        className="flex items-center justify-between px-6 w-full h-[70px] bg-white border-2 border-[#e6f4ea] no-underline shadow-md transition-all active:scale-[0.98]"
+                      >
+                        <span className="text-[17px] font-bold text-[#1a1a1a]">Tüm Listeyi İncele</span>
+                        <span className="text-2xl text-[#1e8e3e] font-light">›</span>
+                      </a>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
+
+              {/* Discount Area */}
+              <div className="border border-dashed border-[#ddd] p-5 rounded bg-[#fafafa] mb-10">
+                <div className="text-sm font-bold text-[#333] mb-1">
+                  İndirim Kanalıma Katıl 🚀
+                </div>
+                <div className="text-xs text-[#777] mb-4">
+                  Anlık fırsatları yakala, kazançlı çık.
+                </div>
+                <div className="flex gap-2.5">
+                  {profile?.telegramUrl && (
+                    <a 
+                      href={profile.telegramUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-2 h-11 bg-white border border-[#e0e0e0] rounded no-underline font-semibold text-[13px] shadow-sm hover:shadow-md transition-shadow"
+                      style={{ color: '#0088cc' }}
+                    >
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" 
+                        width={18} 
+                        height={18} 
+                        alt="Telegram"
+                      />
+                      Telegram
+                    </a>
+                  )}
+                  {profile?.whatsappUrl && (
+                    <a 
+                      href={profile.whatsappUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-2 h-11 bg-white border border-[#e0e0e0] rounded no-underline font-semibold text-[13px] shadow-sm hover:shadow-md transition-shadow"
+                      style={{ color: '#25D366' }}
+                    >
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                        width={18} 
+                        height={18} 
+                        alt="WhatsApp"
+                      />
+                      WhatsApp
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Show Product Grid for Product Lists (showDirectLinks: false)
+            <div className="flex flex-wrap gap-2.5 justify-center">
             {sortedLinks.length > 0 ? (
               sortedLinks.map((item) => {
                 const link = item.link;
@@ -295,6 +463,7 @@ export default function ListDetails() {
               </div>
             )}
           </div>
+          )}
 
           {/* YouTube Video Section */}
           {embedUrl && (

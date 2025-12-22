@@ -25,10 +25,12 @@ export const CuratedListCard: React.FC<CuratedListCardProps> = ({ list, productC
     >
       {/* Üst Taraf: Kapak Resmi - Kartın yarısını kaplayacak şekilde büyütüldü */}
       <div className="w-full h-64 relative overflow-hidden flex-shrink-0">
-        <div className="absolute top-3 left-3 z-10 bg-white/90 backdrop-blur-sm text-[#333] text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
-            <Layers size={12} />
-            {productCount} Ürün
-        </div>
+        {list.showDirectLinks !== false && (
+          <div className="absolute top-3 left-3 z-10 bg-white/90 backdrop-blur-sm text-[#333] text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
+              <Layers size={12} />
+              {productCount} Ürün
+          </div>
+        )}
         {list.coverImage ? (
           <img
             src={list.coverImage}
