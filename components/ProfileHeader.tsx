@@ -76,11 +76,8 @@ export const ProfileHeader: React.FC = () => {
           {/* Social Media Links */}
           {(profile?.instagramUrl || profile?.youtubeUrl || profile?.tiktokUrl) && (
             <div className="flex-1 bg-[#fcfcfc] border border-solid border-[#e0e0e0] p-5 px-4">
-              <div className="font-bold text-sm text-[#333] mb-1">
+              <div className="font-bold text-sm text-[#333] mb-4">
                 Sosyal Medya
-              </div>
-              <div className="text-xs text-[#777] mb-4">
-                İçeriklerimi takip et, güncel kal.
               </div>
               <div className="flex flex-col gap-2.5 mt-3">
                 {profile.instagramUrl && (
@@ -108,7 +105,7 @@ export const ProfileHeader: React.FC = () => {
                     className="w-full bg-white border border-[#ddd] rounded p-2.5 no-underline flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[#FF0000] hover:shadow-md transition-shadow"
                   >
                     <img 
-                      src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" 
+                      src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" 
                       width={18}
                       height={18}
                       alt="YouTube"
@@ -142,11 +139,8 @@ export const ProfileHeader: React.FC = () => {
           {/* Discount Channels */}
           {(profile?.telegramUrl || profile?.whatsappUrl) && (
             <div className="flex-1 bg-[#fcfcfc] border border-solid border-[#e0e0e0] p-5 px-4">
-            <div className="font-bold text-sm text-[#333] mb-1">
+            <div className="font-bold text-sm text-[#333] mb-4">
               İndirim Kanalıma Katıl
-            </div>
-            <div className="text-xs text-[#777] mb-4">
-              Anlık fırsatları yakala, kazançlı çık.
             </div>
               <div className="flex flex-col gap-2.5 mt-3">
                 {profile.telegramUrl && (
