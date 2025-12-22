@@ -195,20 +195,25 @@ export default function ProductDetail() {
   );
 
   return (
-    <div className="min-h-screen bg-white font-['Open_Sans',sans-serif] flex justify-center py-5 px-5">
+    <div className="min-h-screen bg-white font-system flex justify-center py-5 px-5">
       <div className="w-full max-w-[400px] text-center">
         {/* Product Image */}
         {link.imageUrl ? (
           <img 
             src={link.imageUrl} 
             alt={link.title}
-            className="w-full max-w-[300px] h-auto mx-auto mb-5"
+            className="w-full max-w-[150px] h-auto mx-auto mb-5"
           />
         ) : (
-          <div className="w-full max-w-[300px] aspect-square mx-auto mb-5 bg-gray-100 flex items-center justify-center">
+          <div className="w-full max-w-[150px] aspect-square mx-auto mb-5 bg-gray-100 flex items-center justify-center">
             <ExternalLink size={60} className="text-gray-400" />
           </div>
         )}
+
+        {/* Product Title */}
+        <h1 className="text-lg font-normal text-[#1a1a1a] mb-4 px-2.5">
+          {link.title}
+        </h1>
 
         {/* Product Description */}
         {link.description && (
@@ -218,7 +223,7 @@ export default function ProductDetail() {
         )}
 
         {/* Güncel Fiyat Yönlendirmesi */}
-        <div className="text-[15px] font-bold text-[#1a1a1a] mb-3">
+        <div className="text-[15px] text-[#1a1a1a] mb-3">
           Güncel Fiyatını Gör ↓
         </div>
 
@@ -301,9 +306,9 @@ export default function ProductDetail() {
 
         {/* İndirim Kanalı Kutusu */}
         {(profile?.telegramUrl || profile?.whatsappUrl) && (
-          <div className="bg-[#fcfcfc] border border-dashed border-[#e0e0e0] rounded-lg p-5 px-4 mb-6">
+          <div className="bg-[#fcfcfc] border border-solid border-[#e0e0e0] p-5 px-4 mb-6 mt-8">
             <div className="font-bold text-sm text-[#333] mb-1">
-              İndirim Kanalıma Katıl 🚀
+              İndirim Kanalıma Katıl
             </div>
             <div className="text-xs text-[#777] mb-4">
               Anlık fırsatları yakala, kazançlı çık.
