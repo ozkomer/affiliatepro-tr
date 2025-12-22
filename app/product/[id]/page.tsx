@@ -285,14 +285,14 @@ export default function ProductDetail() {
         </div>
 
         {/* YouTube Video Section */}
-        {(link.youtubeUrl || profile?.youtubeUrl) && (
+        {link.youtubeUrl && (
           <div className="bg-[#fcfcfc] border border-solid border-[#e0e0e0] p-5 px-4 mb-6 mt-8">
             <div className="font-bold text-sm text-[#333] mb-1">
               İnceleme Videosunu İzle
             </div>
             <div className="flex gap-2.5 mt-3">
               <a 
-                href={link.youtubeUrl || profile?.youtubeUrl || '#'} 
+                href={link.youtubeUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex-1 bg-white border border-[#ddd] rounded p-2.5 no-underline flex items-center justify-center hover:shadow-md transition-shadow"
