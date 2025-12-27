@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
-import { ProfileHeader } from '@/components/ProfileHeader';
 
 interface UserProfile {
   telegramUrl?: string;
@@ -134,28 +133,30 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900">
-        <div className="max-w-4xl mx-auto px-4 w-full py-20">
-          <div className="text-center text-gray-400">Yükleniyor...</div>
+      <div className="min-h-screen bg-white font-system flex justify-center items-center py-5 px-5">
+        <div className="flex flex-col items-center justify-center">
+          {/* Eski Mac tarzı loading spinner */}
+          <div className="relative w-12 h-12">
+            <div className="absolute inset-0 border-2 border-gray-200 rounded-full"></div>
+            <div className="absolute inset-0 border-2 border-transparent border-t-[#1a1a1a] rounded-full animate-spin" style={{ animationDuration: '0.8s' }}></div>
+          </div>
         </div>
-        <ProfileHeader />
       </div>
     );
   }
 
   if (!link) {
     return (
-      <div className="min-h-screen bg-gray-900">
-        <div className="max-w-4xl mx-auto px-4 w-full py-20">
-          <div className="text-center text-gray-400">
-            <h2 className="text-2xl font-bold text-white mb-4">Ürün Bulunamadı</h2>
-            <p className="text-gray-300 mb-6">Aradığınız ürün mevcut değil veya kaldırılmış olabilir.</p>
+      <div className="min-h-screen bg-white font-system flex justify-center py-5 px-5">
+        <div className="w-full max-w-[400px] text-center">
+          <div className="text-[#1a1a1a] py-20">
+            <h2 className="text-2xl font-bold mb-4">Ürün Bulunamadı</h2>
+            <p className="text-[#777] mb-6">Aradığınız ürün mevcut değil veya kaldırılmış olabilir.</p>
             <Link href="/" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
               Ana Sayfaya Dön
             </Link>
           </div>
         </div>
-        <ProfileHeader />
       </div>
     );
   }
@@ -186,14 +187,6 @@ export default function ProductDetail() {
   };
 
   const embedUrl = link.youtubeUrl ? getYouTubeEmbedUrl(link.youtubeUrl) : null;
-
-  // Get primary product URLs for Amazon and Hepsiburada
-  const amazonUrl = link.productUrls?.find(pu => 
-    pu.ecommerceBrand.name.toLowerCase().includes('amazon')
-  );
-  const hepsiburadaUrl = link.productUrls?.find(pu => 
-    pu.ecommerceBrand.name.toLowerCase().includes('hepsiburada')
-  );
 
   return (
     <div className="min-h-screen bg-white font-system flex justify-center py-5 px-5">
@@ -229,57 +222,46 @@ export default function ProductDetail() {
         </div>
 
         {/* Mağaza Butonları */}
-        <div className="flex gap-2.5 justify-center mb-7.5">
-          {amazonUrl && (
-            <a 
-              href={amazonUrl.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex-1 bg-white border border-[#ddd] rounded p-3 no-underline shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
-            >
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
-                alt="Amazon"
-                className="h-6 w-auto"
-              />
-            </a>
-          )}
-          {hepsiburadaUrl && (
-            <a 
-              href={hepsiburadaUrl.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex-1 bg-white border border-[#ddd] rounded p-3 no-underline shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
-            >
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/2/20/Hepsiburada_logo_official.svg" 
-                alt="Hepsiburada"
-                className="h-6 w-auto"
-              />
-            </a>
-          )}
-          {/* Fallback: Show all product URLs if Amazon/Hepsiburada not found */}
-          {!amazonUrl && !hepsiburadaUrl && link.productUrls && link.productUrls.length > 0 && (
+        <div className="grid grid-cols-2 gap-2.5 mb-7.5">
+          {link.productUrls && link.productUrls.length > 0 && (
             <>
-              {link.productUrls.slice(0, 2).map((productUrl) => (
-                <a
-                  key={productUrl.id}
-                  href={productUrl.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 bg-white border border-[#ddd] rounded p-3 no-underline shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
-                >
-                  {productUrl.ecommerceBrand.logo ? (
-                    <img 
-                      src={productUrl.ecommerceBrand.logo} 
-                      alt={productUrl.ecommerceBrand.name}
-                      className="h-6 w-auto"
-                    />
-                  ) : (
-                    <span className="text-xs font-semibold">{productUrl.ecommerceBrand.name}</span>
-                  )}
-                </a>
-              ))}
+              {link.productUrls.map((productUrl) => {
+                const brandName = productUrl.ecommerceBrand.name.toLowerCase();
+                const isAmazon = brandName.includes('amazon');
+                const isHepsiburada = brandName.includes('hepsiburada');
+                
+                return (
+                  <a
+                    key={productUrl.id}
+                    href={productUrl.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white border border-[#ddd] rounded p-3 no-underline shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
+                  >
+                    {isAmazon ? (
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
+                        alt="Amazon"
+                        className="h-6 w-auto"
+                      />
+                    ) : isHepsiburada ? (
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/2/20/Hepsiburada_logo_official.svg" 
+                        alt="Hepsiburada"
+                        className="h-6 w-auto"
+                      />
+                    ) : productUrl.ecommerceBrand.logo ? (
+                      <img 
+                        src={productUrl.ecommerceBrand.logo} 
+                        alt={productUrl.ecommerceBrand.name}
+                        className="h-6 w-auto"
+                      />
+                    ) : (
+                      <span className="text-xs font-semibold">{productUrl.ecommerceBrand.name}</span>
+                    )}
+                  </a>
+                );
+              })}
             </>
           )}
         </div>

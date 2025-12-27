@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ProfileHeader } from '@/components/ProfileHeader';
 
 interface ProductUrl {
   id: string;
@@ -144,13 +143,14 @@ export default function ListDetails() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white font-system flex flex-col">
-        <div className="flex justify-center py-5 px-5 flex-grow">
-          <div className="w-full max-w-[400px] text-center">
-            <div className="text-gray-400 py-20">Yükleniyor...</div>
+      <div className="min-h-screen bg-white font-system flex justify-center items-center py-5 px-5">
+        <div className="flex flex-col items-center justify-center">
+          {/* Eski Mac tarzı loading spinner */}
+          <div className="relative w-12 h-12">
+            <div className="absolute inset-0 border-2 border-gray-200 rounded-full"></div>
+            <div className="absolute inset-0 border-2 border-transparent border-t-[#1a1a1a] rounded-full animate-spin" style={{ animationDuration: '0.8s' }}></div>
           </div>
         </div>
-        <ProfileHeader />
       </div>
     );
   }
@@ -166,7 +166,6 @@ export default function ListDetails() {
             </div>
           </div>
         </div>
-        <ProfileHeader />
       </div>
     );
   }
@@ -175,17 +174,6 @@ export default function ListDetails() {
   const sortedLinks = list.links
     .filter(item => item.link !== null)
     .sort((a, b) => a.order - b.order);
-
-  // Get primary product URLs for Amazon and Hepsiburada
-  const getPrimaryUrls = (link: AffiliateLink) => {
-    const amazonUrl = link.productUrls?.find(pu => 
-      pu.ecommerceBrand.name.toLowerCase().includes('amazon')
-    );
-    const hepsiburadaUrl = link.productUrls?.find(pu => 
-      pu.ecommerceBrand.name.toLowerCase().includes('hepsiburada')
-    );
-    return { amazonUrl, hepsiburadaUrl };
-  };
 
   // Get primary list URLs for Amazon and Hepsiburada
   const getPrimaryListUrls = () => {
@@ -360,9 +348,6 @@ export default function ListDetails() {
                 const link = item.link;
                 if (!link) return null;
 
-                const { amazonUrl, hepsiburadaUrl } = getPrimaryUrls(link);
-                const hasUrls = amazonUrl || hepsiburadaUrl || (link.productUrls && link.productUrls.length > 0);
-
                 return (
                   <Link
                     key={item.id}
@@ -394,63 +379,46 @@ export default function ListDetails() {
                       </div>
 
                       {/* Store Buttons */}
-                      {hasUrls && (
-                        <div className="space-y-1" onClick={(e) => e.stopPropagation()}>
-                          {amazonUrl && (
-                            <a 
-                              href={amazonUrl.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex items-center justify-center bg-white border border-[#ddd] rounded p-1.5 mt-1 no-underline shadow-sm hover:shadow-md transition-shadow"
-                            >
-                              <img 
-                                src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
-                                alt="Amazon"
-                                className="h-6 w-auto"
-                              />
-                            </a>
-                          )}
-                          {hepsiburadaUrl && (
-                            <a 
-                              href={hepsiburadaUrl.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex items-center justify-center bg-white border border-[#ddd] rounded p-1.5 mt-1 no-underline shadow-sm hover:shadow-md transition-shadow"
-                            >
-                              <img 
-                                src="https://upload.wikimedia.org/wikipedia/commons/2/20/Hepsiburada_logo_official.svg" 
-                                alt="Hepsiburada"
-                                className="h-6 w-auto"
-                              />
-                            </a>
-                          )}
-                          {/* Fallback: Show first 2 product URLs if Amazon/Hepsiburada not found */}
-                          {!amazonUrl && !hepsiburadaUrl && link.productUrls && link.productUrls.length > 0 && (
-                            <>
-                              {link.productUrls.slice(0, 2).map((productUrl) => (
-                                <a
-                                  key={productUrl.id}
-                                  href={productUrl.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="flex items-center justify-center bg-white border border-[#ddd] rounded p-1.5 mt-1 no-underline shadow-sm hover:shadow-md transition-shadow"
-                                >
-                                  {productUrl.ecommerceBrand.logo ? (
-                                    <img 
-                                      src={productUrl.ecommerceBrand.logo} 
-                                      alt={productUrl.ecommerceBrand.name}
-                                      className="h-6 w-auto"
-                                    />
-                                  ) : (
-                                    <span className="text-xs font-semibold">{productUrl.ecommerceBrand.name}</span>
-                                  )}
-                                </a>
-                              ))}
-                            </>
-                          )}
+                      {link.productUrls && link.productUrls.length > 0 && (
+                        <div className="grid grid-cols-2 gap-1" onClick={(e) => e.stopPropagation()}>
+                          {link.productUrls.map((productUrl) => {
+                            const brandName = productUrl.ecommerceBrand.name.toLowerCase();
+                            const isAmazon = brandName.includes('amazon');
+                            const isHepsiburada = brandName.includes('hepsiburada');
+                            
+                            return (
+                              <a
+                                key={productUrl.id}
+                                href={productUrl.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center justify-center bg-white border border-[#ddd] rounded p-1.5 no-underline shadow-sm hover:shadow-md transition-shadow"
+                              >
+                                {isAmazon ? (
+                                  <img 
+                                    src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
+                                    alt="Amazon"
+                                    className="h-6 w-auto"
+                                  />
+                                ) : isHepsiburada ? (
+                                  <img 
+                                    src="https://upload.wikimedia.org/wikipedia/commons/2/20/Hepsiburada_logo_official.svg" 
+                                    alt="Hepsiburada"
+                                    className="h-6 w-auto"
+                                  />
+                                ) : productUrl.ecommerceBrand.logo ? (
+                                  <img 
+                                    src={productUrl.ecommerceBrand.logo} 
+                                    alt={productUrl.ecommerceBrand.name}
+                                    className="h-6 w-auto"
+                                  />
+                                ) : (
+                                  <span className="text-xs font-semibold">{productUrl.ecommerceBrand.name}</span>
+                                )}
+                              </a>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -486,9 +454,6 @@ export default function ListDetails() {
           </div>
         </div>
       </div>
-
-      {/* Profile Header - En Altta */}
-      <ProfileHeader />
     </div>
   );
 }
