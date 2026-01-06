@@ -222,7 +222,7 @@ export default function ProductDetail() {
         </div>
 
         {/* Mağaza Butonları */}
-        <div className="grid grid-cols-2 gap-2.5 mb-7.5">
+        <div className={`grid gap-2.5 mb-7.5 ${link.productUrls && link.productUrls.length === 1 ? 'grid-cols-1 justify-center max-w-[150px] mx-auto' : 'grid-cols-2'}`}>
           {link.productUrls && link.productUrls.length > 0 && (
             <>
               {link.productUrls.map((productUrl) => {

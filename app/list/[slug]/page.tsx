@@ -380,7 +380,10 @@ export default function ListDetails() {
 
                       {/* Store Buttons */}
                       {link.productUrls && link.productUrls.length > 0 && (
-                        <div className="grid grid-cols-2 gap-1" onClick={(e) => e.stopPropagation()}>
+                        <div 
+                          className={`grid gap-1 ${link.productUrls.length === 1 ? 'grid-cols-1 justify-center max-w-[120px] mx-auto' : 'grid-cols-2'}`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {link.productUrls.map((productUrl) => {
                             const brandName = productUrl.ecommerceBrand.name.toLowerCase();
                             const isAmazon = brandName.includes('amazon');
